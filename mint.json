@@ -5,9 +5,9 @@
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon_rendi.svg",
   "colors": {
-    "primary": "#0D9373",
+    "primary": "#E7FF6E",
     "light": "#F3FFB7",
     "dark": "#6BB666",
     "anchors": {
@@ -18,7 +18,7 @@
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "url": "mailto:support@rendi.dev"
     }
   ],
   "topbarCtaButton": {
