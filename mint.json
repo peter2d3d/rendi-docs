@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Rendi",
   "logo": {
     "dark": "/logo/rendi_dark.svg",
     "light": "/logo/rendi_light.svg"
@@ -22,8 +22,8 @@
     }
   ],
   "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "name": "Get Started",
+    "url": "https://www.rendi.dev/#get-started"
   },
   "tabs": [
     {
@@ -31,41 +31,23 @@
       "url": "api-reference"
     }
   ],
-  "anchors": [
-    {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
-    },
-    {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
-    }
-  ],
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "Welcome",
       "pages": [
         "introduction",
-        "quickstart",
-        "development"
+        "getting started"
       ]
     },
     {
-      "group": "Essentials",
+      "group": "Examples",
       "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
+        "examples/trim",
+        "examples/gif",
+        "examples/images-to-video",
+        "examples/thumbnail",
+        "examples/multiple-commands",
+        "examples/host-output"
       ]
     },
     {
@@ -83,11 +65,6 @@
       ]
     }
   ],
-  "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://linkedin.com/company/mintlify"
-  },
   "analytics": {
     "ga4": {
         "measurementId": "G-TX18XXSKL8"
@@ -99,10 +76,8 @@
         "hjid": "5186749",
         "hjsv": "6"
     },
-
     "mixpanel": {
         "projectToken": "28dc0233f8ad77a5de6722a2dddabaf5"
-    },
-
-}
+    }
+  }
 }
