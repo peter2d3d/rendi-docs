@@ -10,7 +10,7 @@
 		  "url": "http://api.rendi.dev"
 		}
 	],
- "paths": {
+   "paths": {
     "/run-ffmpeg-command": {
       "post": {
         "tags": [
