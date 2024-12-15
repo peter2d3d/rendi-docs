@@ -149,8 +149,10 @@
             "schema": {
               "type": "string",
               "format": "uuid",
+              "description": "The UUID of the FFmpeg command to check status for",
               "title": "Command Id"
-            }
+            },
+            "description": "The UUID of the FFmpeg command to check status for"
           }
         ],
         "responses": {
@@ -213,7 +215,8 @@
           "PROCESSING",
           "FAILED",
           "SUCCESS",
-          "TIME_OUT"
+          "TIME_OUT",
+          "QUOTA_EXCEEDED"
         ],
         "title": "CommandStatus"
       },
@@ -245,9 +248,9 @@
               }
             ],
             "title": "Output Files",
-            "description": "Dictionary mapping file aliases to their output file paths",
+            "description": "Dictionary mapping file aliases to their output file storage",
             "example": {
-              "output1": "output.mp4"
+              "output1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
             }
           },
           "status": {
@@ -263,7 +266,7 @@
         "title": "CommandStatusResponse",
         "example": {
           "output_files": {
-            "output1": "output.mp4"
+            "output1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
           },
           "status": "SUCCESS"
         }
@@ -351,7 +354,7 @@
             },
             "type": "array",
             "title": "Ffmpeg Commands",
-            "description": "FFmpeg commands string using {{alias}} placeholders for input and output files",
+            "description": "FFmpeg commands list of strings using {{alias}} placeholders for input and output files",
             "example": [
               "-i {{input1}} -vf scale=1280:720 {{output1}}",
               "-i {{input1}} -vf scale=1920:1080 {{output2}}"
