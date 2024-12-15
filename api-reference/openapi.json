@@ -316,6 +316,7 @@
     "securitySchemes": {
       "APIKeyHeader": {
         "type": "apiKey",
+		"description": "API key required for authentication. Must be provided in the X-API-KEY header.",
         "in": "header",
         "name": "X-API-KEY"
       }
