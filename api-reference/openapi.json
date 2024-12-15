@@ -196,7 +196,7 @@
           "FFmpeg Commands"
         ],
         "summary": "Check Command Status",
-        "description": "Check the status of a previously submitted FFmpeg command.",
+        "description": "Check the status of a previously submitted FFmpeg command.\n    \n    Returns:\n    - Current processing status\n    - Output file information (when available)\n    - Error details (if failed)",
         "operationId": "poll_command_poll_command__command_id__get",
         "security": [
           {
@@ -258,64 +258,14 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      },
       "CommandResponse": {
         "properties": {
           "command_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Command Id"
+            "title": "Command Id",
+            "description": "Unique identifier for the submitted FFmpeg command",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
           }
         },
         "type": "object",
@@ -326,12 +276,36 @@
       },
       "CommandStatusResponse": {
         "properties": {
+          "error_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Details",
+            "description": "Error details if the command failed",
+            "example": "Command failed to complete"
+          },
           "output_files": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object",
-            "title": "Output Files"
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Files",
+            "description": "Dictionary mapping file aliases to their output file paths",
+            "example": {
+              "output1": "output.mp4"
+            }
           },
           "status": {
             "type": "string",
@@ -342,12 +316,13 @@
               "SUCCESS",
               "TIME_OUT"
             ],
-            "title": "Status"
+            "title": "Status",
+            "description": "Current status of the FFmpeg command:\n        - PENDING: Command is queued\n        - PROCESSING: Command is currently running\n        - FAILED: Command failed to complete\n        - SUCCESS: Command completed successfully\n        - TIME_OUT: Command exceeded maximum execution time",
+            "example": "PROCESSING"
           }
         },
         "type": "object",
         "required": [
-          "output_files",
           "status"
         ],
         "title": "CommandStatusResponse",
@@ -365,18 +340,28 @@
               "type": "string"
             },
             "type": "object",
-            "title": "Input Files"
+            "title": "Input Files",
+            "description": "Dictionary mapping file aliases to their storage paths",
+            "example": {
+              "input1": "s3://public-bucket/videos/first-video.mp4"
+            }
           },
           "output_files": {
             "additionalProperties": {
               "type": "string"
             },
             "type": "object",
-            "title": "Output Files"
+            "title": "Output Files",
+            "description": "Dictionary mapping file aliases to their desired output file names",
+            "example": {
+              "output1": "output.mp4"
+            }
           },
           "ffmpeg_command": {
             "type": "string",
-            "title": "Ffmpeg Command"
+            "title": "Ffmpeg Command",
+            "description": "FFmpeg command string using {{alias}} placeholders for input and output files",
+            "example": "-i {{input1}} -vf scale=1280:720 {{output1}}"
           }
         },
         "type": "object",
