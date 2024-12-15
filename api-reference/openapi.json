@@ -10,7 +10,7 @@
 		  "url": "http://api.rendi.dev"
 		}
 	],
-   "paths": {
+ "paths": {
     "/run-ffmpeg-command": {
       "post": {
         "tags": [
@@ -448,7 +448,7 @@
     "securitySchemes": {
       "APIKeyHeader": {
         "type": "apiKey",
-		"description": "API key required for authentication. Must be provided in the X-API-KEY header.",
+        "description": "API key required for authentication. Must be provided in the X-API-KEY header.",
         "in": "header",
         "name": "X-API-KEY"
       }
