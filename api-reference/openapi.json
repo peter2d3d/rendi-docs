@@ -71,14 +71,14 @@
         ]
       }
     },
-    "/run-ffmpeg-multiple-commands": {
+    "/run-multiple-ffmpeg-commands": {
       "post": {
         "tags": [
           "FFmpeg Commands"
         ],
         "summary": "Run Multiple FFmpeg Commands",
-        "description": "Submit multiple FFmpeg command based on the same input files for multiple processing.",
-        "operationId": "run_ffmpeg_multiple_commands_run_ffmpeg_multiple_commands_post",
+        "description": "Submit multiple FFmpeg commands based on the same input files for multiple processing.",
+        "operationId": "run_multiple_ffmpeg_commands_run_multiple_ffmpeg_commands_post",
         "requestBody": {
           "content": {
             "application/json": {
