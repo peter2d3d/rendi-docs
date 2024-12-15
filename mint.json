@@ -64,8 +64,8 @@
       "group": "Endpoint Examples",
       "pages": [
         "api-reference/endpoint/run-ffmpeg-command",
-        "api-reference/endpoint/poll-command"
-		"api-reference/endpoint/run-multiple-ffmpeg-commands",
+        "api-reference/endpoint/poll-command",
+		"api-reference/endpoint/run-multiple-ffmpeg-commands"
       ]
     },
 	{
