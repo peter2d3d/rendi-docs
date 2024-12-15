@@ -167,7 +167,7 @@
         },
         "security": [
           {
-            "HTTPBearer": []
+            "APIKeyHeader": []
           }
         ]
       }
@@ -178,7 +178,7 @@
         "operationId": "poll_command_poll_command__command_id__get",
         "security": [
           {
-            "HTTPBearer": []
+            "APIKeyHeader": []
           }
         ],
         "parameters": [
@@ -389,6 +389,11 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer"
+      },
+      APIKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
       }
     }
   }
