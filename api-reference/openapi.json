@@ -10,7 +10,7 @@
 		  "url": "http://api.rendi.dev"
 		}
 	],
-"paths": {
+ "paths": {
     "/run-ffmpeg-command": {
       "post": {
         "tags": [
@@ -71,6 +71,63 @@
         ]
       }
     },
+    "/run-ffmpeg-multiple-commands": {
+      "post": {
+        "tags": [
+          "FFmpeg Commands"
+        ],
+        "summary": "Run Multiple FFmpeg Commands",
+        "description": "Submit multiple FFmpeg command based on the same input files for multiple processing.",
+        "operationId": "run_ffmpeg_multiple_commands_run_ffmpeg_multiple_commands_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FFmpegMutiplieCommandsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MultipleCommandsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
     "/poll-command/{command_id}": {
       "get": {
         "tags": [
@@ -98,17 +155,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved command status",
+            "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommandStatusResponse"
-                },
-                "example": {
-                  "output_files": {
-                    "output1": "output.mp4"
-                  },
-                  "status": "SUCCESS"
                 }
               }
             }
@@ -227,7 +278,8 @@
             "title": "Input Files",
             "description": "Dictionary mapping file aliases to their storage paths",
             "example": {
-              "input1": "s3://public-bucket/videos/first-video.mp4"
+              "input1": "s3://public-bucket/videos/first-video.mp4",
+              "input2": "s3://public-bucket/videos/second-video.mp4"
             }
           },
           "output_files": {
@@ -238,14 +290,15 @@
             "title": "Output Files",
             "description": "Dictionary mapping file aliases to their desired output file names",
             "example": {
-              "output1": "output.mp4"
+              "output1": "output_one.mp4",
+              "output2": "output_two.mp4"
             }
           },
           "ffmpeg_command": {
             "type": "string",
             "title": "Ffmpeg Command",
             "description": "FFmpeg command string using {{alias}} placeholders for input and output files",
-            "example": "-i {{input1}} -vf scale=1280:720 {{output1}}"
+            "example": "-i {{input1}} -i {{input2}} -filter_complex '[0:v][1:v]hstack=inputs=2[v]' -map '[v]' {{output1}}"
           }
         },
         "type": "object",
@@ -266,6 +319,66 @@
           }
         }
       },
+      "FFmpegMutiplieCommandsRequest": {
+        "properties": {
+          "input_files": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Input Files",
+            "description": "Dictionary mapping file aliases to their storage paths",
+            "example": {
+              "input1": "s3://public-bucket/videos/first-video.mp4",
+              "input2": "s3://public-bucket/videos/second-video.mp4"
+            }
+          },
+          "output_files": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Output Files",
+            "description": "Dictionary mapping file aliases to their desired output file names",
+            "example": {
+              "output1": "output_one.mp4",
+              "output2": "output_two.mp4"
+            }
+          },
+          "ffmpeg_commands": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ffmpeg Commands",
+            "description": "FFmpeg commands string using {{alias}} placeholders for input and output files",
+            "example": [
+              "-i {{input1}} -vf scale=1280:720 {{output1}}",
+              "-i {{input1}} -vf scale=1920:1080 {{output2}}"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "input_files",
+          "output_files",
+          "ffmpeg_commands"
+        ],
+        "title": "FFmpegMutiplieCommandsRequest",
+        "example": {
+          "ffmpeg_commands": [
+            "-i {{input1}} -vf scale=1280:720 {{output1}}",
+            "-i {{input1}} -vf scale=1920:1080 {{output2}}"
+          ],
+          "input_files": {
+            "input1": "s3://public-bucket/videos/input-video.mp4"
+          },
+          "output_files": {
+            "output1": "output_720.mp4",
+            "output2": "output_1080.mp4"
+          }
+        }
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -278,6 +391,25 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "MultipleCommandsResponse": {
+        "properties": {
+          "command_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Command Ids",
+            "description": "List of unique identifiers for the submitted FFmpeg commands, order by original commands order",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          }
+        },
+        "type": "object",
+        "required": [
+          "command_ids"
+        ],
+        "title": "MultipleCommandsResponse"
       },
       "ValidationError": {
         "properties": {
