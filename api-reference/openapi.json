@@ -442,7 +442,8 @@
           "type"
         ],
         "title": "ValidationError"
-      },
+      }
+    },
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
