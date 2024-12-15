@@ -132,7 +132,11 @@
     },
     "/run-ffmpeg-command": {
       "post": {
-        "summary": "Run Ffmpeg Command",
+        "tags": [
+          "FFmpeg Commands"
+        ],
+        "summary": "Run FFmpeg Command",
+        "description": "Submit an FFmpeg command for processing with input and output file specifications.",
         "operationId": "run_ffmpeg_command_run_ffmpeg_command_post",
         "requestBody": {
           "content": {
@@ -146,11 +150,24 @@
         },
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Successfully submitted FFmpeg command",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommandResponse"
+                },
+                "example": {
+                  "command_id": "123e4567-e89b-12d3-a456-426614174000"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
                 }
               }
             }
@@ -175,7 +192,11 @@
     },
     "/poll-command/{command_id}": {
       "get": {
-        "summary": "Poll Command",
+        "tags": [
+          "FFmpeg Commands"
+        ],
+        "summary": "Check Command Status",
+        "description": "Check the status of a previously submitted FFmpeg command.",
         "operationId": "poll_command_poll_command__command_id__get",
         "security": [
           {
@@ -196,11 +217,27 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Successfully retrieved command status",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommandStatusResponse"
+                },
+                "example": {
+                  "output_files": {
+                    "output1": "output.mp4"
+                  },
+                  "status": "PROCESSING"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
                 }
               }
             }
@@ -289,16 +326,37 @@
       },
       "CommandStatusResponse": {
         "properties": {
+          "output_files": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Output Files"
+          },
           "status": {
             "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "FAILED",
+              "SUCCESS",
+              "TIME_OUT"
+            ],
             "title": "Status"
           }
         },
         "type": "object",
         "required": [
+          "output_files",
           "status"
         ],
-        "title": "CommandStatusResponse"
+        "title": "CommandStatusResponse",
+        "example": {
+          "output_files": {
+            "output1": "output.mp4"
+          },
+          "status": "SUCCESS"
+        }
       },
       "FFmpegCommandRequest": {
         "properties": {
@@ -384,18 +442,17 @@
           "type"
         ],
         "title": "ValidationError"
-      }
-    },
+      },
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer"
       },
-      "APIKeyHeader": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-API-KEY"
-      }
+        "APIKeyHeader": {
+          "type": "apiKey",
+          "in": "header",
+          "name": "X-API-KEY"
+        }
     }
   }
 }
