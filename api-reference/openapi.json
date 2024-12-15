@@ -402,12 +402,10 @@
             "type": "array",
             "title": "Command Ids",
             "description": "List of unique identifiers for the submitted FFmpeg commands, order by original commands order",
-            "example": {
-              "command_ids": [
-                "123e4567-e89b-12d3-a456-426614174000",
-                "123e4567-e89b-12d3-a456-426614174001"
-              ]
-            }
+            "example": [
+              "123e4567-e89b-12d3-a456-426614174000",
+              "987fcdeb-a89b-43d3-b456-789012345678"
+            ]
           }
         },
         "type": "object",
