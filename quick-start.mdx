@@ -1,0 +1,75 @@
+---
+title: "Quickstart"
+---
+
+Using Rendi is indeed as simple as just using ffmepg locally, but without needing to install anything.
+
+## Register to Rendi, activate you account and get your API key
+
+### [Register](https://www.rendi.dev/#get-started)
+
+
+
+## Run a command to trim the first 10 seconds of a video
+
+We will want to run the following ffmpeg command:
+
+```bash
+ffmpeg -i https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi -ss 00:00 -to 00:10 output.mp4
+```
+
+### Using the same command in Rendi:
+
+```bash
+curl --request POST \
+  --url http://api.rendi.dev/run-ffmpeg-command \
+  --header 'Content-Type: application/json' \
+  --header 'X-API-KEY: <api-key>' \
+  --data '
+  { "input_files": 
+    { "input1":       
+"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"}  
+    ,
+    "output_files": {"output1": "output.mp4"},
+    "ffmpeg_command": "-i {{input1}} -ss 00:00 -to 00:10 {{output1}}"}
+  '
+```
+
+Running this command will return the command\_id:
+
+```json
+{
+  "command_id": "123e4567-e89b-12d3-a456-426614174000"
+}
+```
+
+The command now runs in Rendi and you can check its' status:
+
+
+
+## Poll the command\_id until it reaches status SUCCESS
+
+```bash
+curl --request GET \
+  --url http://api.rendi.dev/poll-command/{command_id} \
+  --header 'X-API-KEY: <api-key>'
+```
+
+While processing the command will pass from status `QUEUED ` to `PROCESSING` to `SUCCESS`
+
+```json
+{
+  "output_files": {
+    "output1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
+  },
+  "status": "SUCCESS"
+}
+```
+
+When the status reaches `SUCCESS` Rendi will return the stored output file with it.&#x20;
+
+
+
+## Get your output video
+
+The result is hosted on Rendi's storage, with a CDN - you can download it and you can serve it as is to your users
