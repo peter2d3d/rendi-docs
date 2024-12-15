@@ -29,6 +29,10 @@
     {
       "name": "API Reference",
       "url": "api-reference"
+    },
+	{
+      "name": "API Reference Sample",
+      "url": "api-reference-sample"
     }
   ],
   "navigation": [
@@ -59,11 +63,22 @@
     {
       "group": "Endpoint Examples",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete",
         "api-reference/endpoint/run-ffmpeg-command",
         "api-reference/endpoint/poll-command"
+      ]
+    },
+	{
+      "group": "API Documentation Sample",
+      "pages": [
+        "api-reference-sample/introduction"
+      ]
+    },
+    {
+      "group": "Endpoint Examples Sample",
+      "pages": [
+        "api-reference-sample/endpoint/get",
+        "api-reference-sample/endpoint/create",
+        "api-reference-sample/endpoint/delete"
       ]
     }
   ],
