@@ -15,7 +15,8 @@
   ],
   "security": [
     {
-      "bearerAuth": []
+      "bearerAuth": [],
+      "APIKeyHeader": []
     }
   ],
   "paths": {
