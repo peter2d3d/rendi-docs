@@ -5,7 +5,12 @@
     "description": "API for running FFmpeg in a cloud environment",
     "version": "1.0.0"
   },
-  "paths": {
+	"servers": [
+		{
+		  "url": "http://api.rendi.dev"
+		}
+	],
+"paths": {
     "/run-ffmpeg-command": {
       "post": {
         "tags": [
@@ -71,8 +76,8 @@
         "tags": [
           "FFmpeg Commands"
         ],
-        "summary": "Check Command Status",
-        "description": "Check the status of a previously submitted FFmpeg command.\n    \n    Returns:\n    - Current processing status\n    - Output file information (when available)\n    - Error details (if failed)",
+        "summary": "Get Command Status",
+        "description": "Get the status of a previously submitted FFmpeg command.",
         "operationId": "poll_command_poll_command__command_id__get",
         "security": [
           {
@@ -103,7 +108,7 @@
                   "output_files": {
                     "output1": "output.mp4"
                   },
-                  "status": "PROCESSING"
+                  "status": "SUCCESS"
                 }
               }
             }
@@ -150,6 +155,17 @@
         ],
         "title": "CommandResponse"
       },
+      "CommandStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "PROCESSING",
+          "FAILED",
+          "SUCCESS",
+          "TIME_OUT"
+        ],
+        "title": "CommandStatus"
+      },
       "CommandStatusResponse": {
         "properties": {
           "error_details": {
@@ -184,17 +200,9 @@
             }
           },
           "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "PROCESSING",
-              "FAILED",
-              "SUCCESS",
-              "TIME_OUT"
-            ],
-            "title": "Status",
-            "description": "Current status of the FFmpeg command:\n        - PENDING: Command is queued\n        - PROCESSING: Command is currently running\n        - FAILED: Command failed to complete\n        - SUCCESS: Command completed successfully\n        - TIME_OUT: Command exceeded maximum execution time",
-            "example": "PROCESSING"
+            "$ref": "#/components/schemas/CommandStatus",
+            "description": "Current status of the FFmpeg command",
+            "example": "SUCCESS"
           }
         },
         "type": "object",
