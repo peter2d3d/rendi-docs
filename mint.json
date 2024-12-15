@@ -39,9 +39,8 @@
     {
       "group": "Welcome",
       "pages": [
-        "introduction",
         "quick-start",
-		"development"
+        "why-rendi"
       ]
     },
     {
