@@ -40,7 +40,8 @@
       "group": "Welcome",
       "pages": [
         "introduction",
-        "getting-started"
+        "getting-started",
+		"development"
       ]
     },
     {
