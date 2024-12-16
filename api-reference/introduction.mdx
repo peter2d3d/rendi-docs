@@ -21,6 +21,8 @@ The **'out\_'** prefix is mandatory for Rendi to consider this as a valid input 
 
 Only alpha-numeric characters and '\_' are allowed for output file names, for the file extension a period character is also allowed (e.g. 'output\_1.mp4').
 
+<Note>You don't need to write the *ffmpeg* word in your commands, this is because we handle this internally</Note>
+
 ## Reasons for aliasing files instead of providing them directly within the command
 
 * The command itself and its' files are separate entities. For example - you can use the same input files for several commands, or reuse the same command with different inputs and outputs.
