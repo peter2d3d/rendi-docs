@@ -5,7 +5,7 @@ description: "Below are more examples for you to try out"
 
 # Generate multiple thumbnails from video
 
-Rendi Body Command:
+Rendi JSON body Command for `run-ffmpeg-command`:
 
 ```json
 { "input_files": 
@@ -18,9 +18,10 @@ Rendi Body Command:
 
 <Accordion title="RESTful queries">
   Run command:
+
   ```bash
   curl --request POST \
-  --url http://api.rendi.dev/run-ffmpeg-command \
+  --url https://api.rendi.dev/v1/run-ffmpeg-command \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
   --data '{ "input_files": 
@@ -31,7 +32,7 @@ Rendi Body Command:
   ```
 
   Running this command will return the command\_id:
-  
+
   ```json
   {
     "command_id": "7f621856-f42a-4e7e-b2f0-806653564a6b"
@@ -62,19 +63,39 @@ Rendi Body Command:
 
 # Create several videos with different resolutions
 
-```bash
-curl --request POST \
-  --url http://api.rendi.dev/run-ffmpeg-command \
-  --header 'Content-Type: application/json' \
-  --header 'X-API-KEY: <api-key>' \
-  --data '{ "input_files": 
-    { "in_1": 
-"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "output_520p.mp4", "out_2": "output_480.mp4"},
-    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[vid1][vid2];[vid1]scale=trunc(oh*a/2)*2:520:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:520:-1:-1\"[520p];[vid2]scale=trunc(oh*a/2)*2:480:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:480:-1:-1\"[480p]\" -map \"[520p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_1}}  -map \"[480p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_2}}"}'
+Rendi JSON body Command for `run-ffmpeg-command`:
+
+```json
+{
+    "input_files": {
+        "in_1": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"
+    },
+    "output_files": {
+        "out_1": "output_520p.mp4",
+        "out_2": "output_480.mp4"
+    },
+    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[vid1][vid2];[vid1]scale=trunc(oh*a/2)*2:520:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:520:-1:-1\"[520p];[vid2]scale=trunc(oh*a/2)*2:480:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:480:-1:-1\"[480p]\" -map \"[520p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_1}}  -map \"[480p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_2}}"
+}
 ```
 
-<Accordion title="Get result">
+<Accordion title="RESTful queries">
+  ```bash
+  curl --request POST \
+    --url https://api.rendi.dev/v1/run-ffmpeg-command \
+    --header 'Content-Type: application/json' \
+    --header 'X-API-KEY: <api-key>' \
+    --data '{
+      "input_files": {
+          "in_1": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"
+      },
+      "output_files": {
+          "out_1": "output_520p.mp4",
+          "out_2": "output_480.mp4"
+      },
+      "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[vid1][vid2];[vid1]scale=trunc(oh*a/2)*2:520:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:520:-1:-1\"[520p];[vid2]scale=trunc(oh*a/2)*2:480:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:480:-1:-1\"[480p]\" -map \"[520p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_1}}  -map \"[480p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_2}}"
+  }'
+  ```
+
   Running this command will return the command\_id:
 
   ```json
@@ -107,19 +128,29 @@ curl --request POST \
 
 # Generate thumbnail + GIF using multiple commands
 
-```bash
-curl --request POST \
-  --url http://api.rendi.dev/run-ffmpeg-command \
-  --header 'Content-Type: application/json' \
-  --header 'X-API-KEY: <api-key>' \
-  --data '{ "input_files": 
+Rendi JSON body Command for `run-ffmpeg-commands`:
+
+```json
+{ "input_files": 
     { "in_1": 
 "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "output_520p.mp4", "out_2": "output_480.mp4"},
-    "ffmpeg_commands": "-i {{in_1}} -filter_complex \"[0:v]split=2[vid1][vid2];[vid1]scale=trunc(oh*a/2)*2:520:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:520:-1:-1\"[520p];[vid2]scale=trunc(oh*a/2)*2:480:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:480:-1:-1\"[480p]\" -map \"[520p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_1}}  -map \"[480p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_2}}"}'
+    "output_files": {"out_1": "thumbnail.jpg", "out_2": "output.gif"},
+    "ffmpeg_commands": ["-i {{in_1}} -ss 00:17 -vframes 1 {{out_1}}", "-i {{in_1}} -vf select='lte(n\\,1)+gt(trunc(t/10),trunc(prev_t/10))',setpts='PTS*0.1',scale=trunc(oh*a/2)*2:80:force_original_aspect_ratio=decrease, pad=trunc(oh*a/2)*2:80:-1:-1 -an -vsync vfr {{out_2}}"]}
 ```
 
-<Accordion title="Get result">
+<Accordion title="RESTful queries">
+  ```bash
+  curl --request POST \
+    --url https://api.rendi.dev/v1/run-ffmpeg-commands \
+    --header 'Content-Type: application/json' \
+    --header 'X-API-KEY: <api-key>' \
+    --data '{ "input_files": 
+      { "in_1": 
+  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
+      "output_files": {"out_1": "thumbnail.jpg", "out_2": "output.gif"},
+      "ffmpeg_commands": ["-i {{in_1}} -ss 00:17 -vframes 1 {{out_1}}", "-i {{in_1}} -vf select='\''lte(n\\,1)+gt(trunc(t/10),trunc(prev_t/10))'\'',setpts='\''PTS*0.1'\'',scale=trunc(oh*a/2)*2:80:force_original_aspect_ratio=decrease, pad=trunc(oh*a/2)*2:80:-1:-1 -an -vsync vfr {{out_2}}"]}'
+  ```
+
   Running this command will return the command\_id:
 
   ```json
@@ -170,26 +201,41 @@ curl --request POST \
   ```
 </Accordion>
 
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
 # Combine images with audio to create a video
 
-```bash
-curl --request POST \
-  --url http://api.rendi.dev/run-ffmpeg-command \
+Rendi JSON body Command for `run-ffmpeg-command`:
+
+```json
+{ "input_files": 
+    { "in_1": 
+"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
+    "output_files": {"out_1": "thumbnail1.jpg", "out_2": "thumbnail2.jpg"},
+    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[first][second];[first]select='gte(t,10)'[thumb1];[second]select='gte(t,20)'[thumb2]\" -map \"[thumb1]\" -frames:v 1 {{out_1}} -map \"[thumb2]\" -frames:v 1 {{out_2}}"
+    }
+```
+
+<Accordion title="RESTful queries">
+  Run command:
+
+  ```bash
+  curl --request POST \
+  --url https://api.rendi.dev/v1/run-ffmpeg-command \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
   --data '{ "input_files": 
     { "in_1": 
-"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "output_520p.mp4", "out_2": "output_480.mp4"},
-    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[vid1][vid2];[vid1]scale=trunc(oh*a/2)*2:520:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:520:-1:-1\"[520p];[vid2]scale=trunc(oh*a/2)*2:480:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:480:-1:-1\"[480p]\" -map \"[520p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_1}}  -map \"[480p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_2}}"}'
-```
+  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
+    "output_files": {"out_1": "thumbnail1.jpg", "out_2": "thumbnail2.jpg"},
+    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[first][second];[first]select='\''gte(t,10)'\''[thumb1];[second]select='\''gte(t,20)'\''[thumb2]\" -map \"[thumb1]\" -frames:v 1 {{out_1}} -map \"[thumb2]\" -frames:v 1 {{out_2}}"}'
+  ```
 
-<Accordion title="Get result">
   Running this command will return the command\_id:
 
   ```json
   {
-    "command_id": "5ea16aeb-b2a4-4952-98f7-7e7dbefbd358"
+    "command_id": "7f621856-f42a-4e7e-b2f0-806653564a6b"
   }
   ```
 
@@ -197,7 +243,7 @@ curl --request POST \
 
   ```bash
   curl --request GET \
-    --url http://api.rendi.dev/poll-command/5ea16aeb-b2a4-4952-98f7-7e7dbefbd358 \
+    --url http://api.rendi.dev/poll-command/7f621856-f42a-4e7e-b2f0-806653564a6b \
     --header 'X-API-KEY: <api-key>'
   ```
 
@@ -206,10 +252,10 @@ curl --request POST \
   ```json
   {
     "output_files": {
-      "out_1": "https://storage.rendi.dev/5ea16aeb-b2a4-4952-98f7-7e7dbefbd358/output_520p.mp4",
-      "out_2": "https://storage.rendi.dev/5ea16aeb-b2a4-4952-98f7-7e7dbefbd358/output_480p.mp4",
+      "out_1": "https://storage.rendi.dev/7f621856-f42a-4e7e-b2f0-806653564a6b/thumbnail1.jpg",
+      "out_2": "https://storage.rendi.dev/7f621856-f42a-4e7e-b2f0-806653564a6b/thumbnail2.jpg",
     },
-    "processing_seconds": 27.98,
+    "processing_seconds": 0.88,
     "status": "SUCCESS"
   }
   ```
@@ -217,24 +263,37 @@ curl --request POST \
 
 # Add subtitles using ASS format
 
-```bash
-curl --request POST \
-  --url http://api.rendi.dev/run-ffmpeg-command \
+Rendi JSON body Command for `run-ffmpeg-command`:
+
+```json
+{ "input_files": 
+    { "in_1": 
+"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
+    "output_files": {"out_1": "thumbnail1.jpg", "out_2": "thumbnail2.jpg"},
+    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[first][second];[first]select='gte(t,10)'[thumb1];[second]select='gte(t,20)'[thumb2]\" -map \"[thumb1]\" -frames:v 1 {{out_1}} -map \"[thumb2]\" -frames:v 1 {{out_2}}"
+    }
+```
+
+<Accordion title="RESTful queries">
+  Run command:
+
+  ```bash
+  curl --request POST \
+  --url https://api.rendi.dev/v1/run-ffmpeg-command \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
   --data '{ "input_files": 
     { "in_1": 
-"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "output_520p.mp4", "out_2": "output_480.mp4"},
-    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[vid1][vid2];[vid1]scale=trunc(oh*a/2)*2:520:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:520:-1:-1\"[520p];[vid2]scale=trunc(oh*a/2)*2:480:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:480:-1:-1\"[480p]\" -map \"[520p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_1}}  -map \"[480p]\" -map 0:a -c:a copy -c:v libx264 -preset medium {{out_2}}"}'
-```
+  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
+    "output_files": {"out_1": "thumbnail1.jpg", "out_2": "thumbnail2.jpg"},
+    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[first][second];[first]select='\''gte(t,10)'\''[thumb1];[second]select='\''gte(t,20)'\''[thumb2]\" -map \"[thumb1]\" -frames:v 1 {{out_1}} -map \"[thumb2]\" -frames:v 1 {{out_2}}"}'
+  ```
 
-<Accordion title="Get result">
   Running this command will return the command\_id:
 
   ```json
   {
-    "command_id": "5ea16aeb-b2a4-4952-98f7-7e7dbefbd358"
+    "command_id": "7f621856-f42a-4e7e-b2f0-806653564a6b"
   }
   ```
 
@@ -242,7 +301,7 @@ curl --request POST \
 
   ```bash
   curl --request GET \
-    --url http://api.rendi.dev/poll-command/5ea16aeb-b2a4-4952-98f7-7e7dbefbd358 \
+    --url http://api.rendi.dev/poll-command/7f621856-f42a-4e7e-b2f0-806653564a6b \
     --header 'X-API-KEY: <api-key>'
   ```
 
@@ -251,10 +310,10 @@ curl --request POST \
   ```json
   {
     "output_files": {
-      "out_1": "https://storage.rendi.dev/5ea16aeb-b2a4-4952-98f7-7e7dbefbd358/output_520p.mp4",
-      "out_2": "https://storage.rendi.dev/5ea16aeb-b2a4-4952-98f7-7e7dbefbd358/output_480p.mp4",
+      "out_1": "https://storage.rendi.dev/7f621856-f42a-4e7e-b2f0-806653564a6b/thumbnail1.jpg",
+      "out_2": "https://storage.rendi.dev/7f621856-f42a-4e7e-b2f0-806653564a6b/thumbnail2.jpg",
     },
-    "processing_seconds": 27.98,
+    "processing_seconds": 0.88,
     "status": "SUCCESS"
   }
   ```
