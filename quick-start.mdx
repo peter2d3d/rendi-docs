@@ -25,14 +25,11 @@ curl --request POST \
   --url http://api.rendi.dev/run-ffmpeg-command \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
-  --data '
-  { "input_files": 
-    { "input1":       
-"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"}  
-    ,
+  --data '{ "input_files": 
+    { "input1": 
+"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
     "output_files": {"output1": "output.mp4"},
-    "ffmpeg_command": "-i {{input1}} -ss 00:00 -to 00:10 {{output1}}"}
-  '
+    "ffmpeg_command": "-i {{input1}} -ss 00:00 -to 00:10 {{output1}}"}'
 ```
 
 Running this command will return the command\_id:
