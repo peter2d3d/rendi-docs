@@ -108,7 +108,7 @@ Rendi JSON body Command for `run-ffmpeg-command`:
 
   ```bash
   curl --request GET \
-    --url http://api.rendi.dev/poll-command/5ea16aeb-b2a4-4952-98f7-7e7dbefbd358 \
+    --url https://api.rendi.dev/v1/poll-command/5ea16aeb-b2a4-4952-98f7-7e7dbefbd358 \
     --header 'X-API-KEY: <api-key>'
   ```
 
@@ -273,17 +273,21 @@ Rendi JSON body Command for `run-ffmpeg-command`:
   ```
 </Accordion>
 
-# Add subtitles using ASS format
+# Add srt subtitles to video
 
 Rendi JSON body Command for `run-ffmpeg-command`:
 
 ```json
-{ "input_files": 
-    { "in_1": 
-"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "thumbnail1.jpg", "out_2": "thumbnail2.jpg"},
-    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[first][second];[first]select='gte(t,10)'[thumb1];[second]select='gte(t,20)'[thumb2]\" -map \"[thumb1]\" -frames:v 1 {{out_1}} -map \"[thumb2]\" -frames:v 1 {{out_2}}"
-    }
+{
+    "input_files": {
+        "in_video": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi",
+        "in_srt": "https://storage.rendi.dev/samples/subtitles.srt"
+    },
+    "output_files": {
+        "out_1": "output.mp4"
+    },
+    "ffmpeg_command": "-i {{in_video}} -vf \"subtitles={{in_srt}}\" -c:v libx264 -crf 20 -c:a aac -b:a 192k {{out_1}}"
+}
 ```
 
 <Accordion title="RESTful queries">
@@ -294,18 +298,23 @@ Rendi JSON body Command for `run-ffmpeg-command`:
   --url https://api.rendi.dev/v1/run-ffmpeg-command \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
-  --data '{ "input_files": 
-    { "in_1": 
-  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "thumbnail1.jpg", "out_2": "thumbnail2.jpg"},
-    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[first][second];[first]select='\''gte(t,10)'\''[thumb1];[second]select='\''gte(t,20)'\''[thumb2]\" -map \"[thumb1]\" -frames:v 1 {{out_1}} -map \"[thumb2]\" -frames:v 1 {{out_2}}"}'
+  --data '{
+      "input_files": {
+          "in_video": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi",
+          "in_srt": "https://storage.rendi.dev/samples/subtitles.srt"
+      },
+      "output_files": {
+          "out_1": "output.mp4"
+      },
+      "ffmpeg_command": "-i {{in_video}} -vf \"subtitles={{in_srt}}\" -c:v libx264 -crf 20 -c:a aac -b:a 192k {{out_1}}"
+  }'
   ```
 
   Running this command will return the command\_id:
 
   ```json
   {
-    "command_id": "7f621856-f42a-4e7e-b2f0-806653564a6b"
+    "command_id": "8e965d59-10fd-44b7-b275-1758cc0fe940"
   }
   ```
 
@@ -313,7 +322,7 @@ Rendi JSON body Command for `run-ffmpeg-command`:
 
   ```bash
   curl --request GET \
-    --url http://api.rendi.dev/poll-command/7f621856-f42a-4e7e-b2f0-806653564a6b \
+    --url https://api.rendi.dev/poll-command/v1/8e965d59-10fd-44b7-b275-1758cc0fe940 \
     --header 'X-API-KEY: <api-key>'
   ```
 
@@ -322,10 +331,9 @@ Rendi JSON body Command for `run-ffmpeg-command`:
   ```json
   {
     "output_files": {
-      "out_1": "https://storage.rendi.dev/7f621856-f42a-4e7e-b2f0-806653564a6b/thumbnail1.jpg",
-      "out_2": "https://storage.rendi.dev/7f621856-f42a-4e7e-b2f0-806653564a6b/thumbnail2.jpg",
+      "out_1": "https://storage.rendi.dev/8e965d59-10fd-44b7-b275-1758cc0fe940/output.mp4"
     },
-    "processing_seconds": 0.88,
+    "processing_seconds": 4.88,
     "status": "SUCCESS"
   }
   ```
