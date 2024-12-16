@@ -1,13 +1,20 @@
 ---
 title: "New API Endpoints"
-description: "Display inline code and code blocks"
-icon: "code"
+description: "Rendi is constantly evolving and developing the hosted FFMpeg capabilities"
 ---
 
-##
+# Webhooks
 
+Instead of having you poll for status of commands, each command will deliver a webhook even once it is done (successfully or failed). The same details will be sent as the polling request - command\_id, output files, failure reason (if applicable), running time.
 
+You could use these webhook especially for ease of integration to no-code or low-code solutions where polling is less comfortable - such as zapier, make etc.
 
-* Use previous command's input\output for another command
+# Chained commands
 
-* Webhook with notification
+Sometimes we run ffmpeg to create another video, and from that output video we want to create a gif or a thumbnail.&#x20;
+
+We will allow you to specify a new type of command - `Chained Command` - where you could stack ffmpeg commands to do just that
+
+# Contact us for requests
+
+Want us to prioritize a feature? Have another feature in mind that you would like us to implement -contact us at [support@rendi.dev](mailto:support@rendi.dev)&#x20;
