@@ -41,19 +41,8 @@
       "pages": [
         "introduction",
         "quick-start",
-        "examples"
+        "examples",
         "coming-soon"
-      ]
-    },
-    {
-      "group": "Examples",
-      "pages": [
-        "examples-old/trim",
-        "examples-old/gif",
-        "examples-old/images-to-video",
-        "examples-old/thumbnail",
-        "examples-old/multiple-commands",
-        "examples-old/host-output"
       ]
     },
     {
