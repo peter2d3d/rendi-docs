@@ -3,20 +3,6 @@ title: "Introduction"
 description: "About the API"
 ---
 
-# RESTful API
-
-We currently only provide the service through a simple RESTful HTTP API, this is in order to keep it as simple as possible, without having you incur any costs of implementation.&#x20;
-
-We want to allow you to easily integrate whatever system you want - python, NodeJS, Zapier, make, n8n, anything, since everything works with web requests.
-
-# Authentication
-
-All API endpoints are authenticated using an API Key which you get when you activate your account. The API Key needs to be provided as the value of HTTP Header `X-API-KEY` as
-
-```http
---header 'X-API-KEY: <RENDI_API_KEY>'
-```
-
 # Command Structure
 
 We use a simple JSON format to send commands.
@@ -48,3 +34,13 @@ Only alpha-numeric characters and '\_' are allowed for output file names, for th
 Currently, output files are stored by Rendi for 24 hours and are provided through a CDN.&#x20;
 
 We do allow special customers to store their files in our storage for longer (and indefinite) periods, and host them through our CDN. If you are interested in this - contact us at [support@rendi.dev](mailto:support@rendi.dev)
+
+# Authentication
+
+All API endpoints are authenticated using an API Key which you get when you activate your account. The API Key needs to be provided as the value of HTTP Header `X-API-KEY` as
+
+```http
+--header 'X-API-KEY: <RENDI_API_KEY>'
+```
+
+#
