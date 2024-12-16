@@ -54,7 +54,7 @@
         "api-reference/endpoint/poll-command",
         "api-reference/endpoint/run-multiple-ffmpeg-commands"
       ]
-    },
+    }
   ],
   "analytics": {
     "ga4": {
