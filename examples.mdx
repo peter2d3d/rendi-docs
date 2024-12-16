@@ -208,12 +208,18 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 Rendi JSON body Command for `run-ffmpeg-command`:
 
 ```json
-{ "input_files": 
-    { "in_1": 
-"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "thumbnail1.jpg", "out_2": "thumbnail2.jpg"},
-    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[first][second];[first]select='gte(t,10)'[thumb1];[second]select='gte(t,20)'[thumb2]\" -map \"[thumb1]\" -frames:v 1 {{out_1}} -map \"[thumb2]\" -frames:v 1 {{out_2}}"
-    }
+{
+    "input_files": {
+        "in_img_1": "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
+        "in_img_2": "https://peach.blender.org/wp-content/uploads/rodents.png",
+        "in_img_3": "https://peach.blender.org/wp-content/uploads/evil-frank.png",
+        "in_audio_1": "https://www.fiftysounds.com/music/neon-lights.mp3"
+    },
+    "output_files": {
+        "out_1": "output.mp4"
+    },
+    "ffmpeg_command": "-loop 1 -t 5 -i {{in_img_1}}  -loop 1 -t 5 -i {{in_img_2}} -loop 1 -t 5 -i {{in_img_3}}  -i {{in_audio_1}} -filter_complex \"[0:v][1:v][2:v]concat=n=3:v=1:a=0,format=yuv420p[v]\"  -map \"[v]\" -map 3:a -c:v libx264 -c:a aac -shortest {{out_1}}"
+}
 ```
 
 <Accordion title="RESTful queries">
@@ -224,18 +230,25 @@ Rendi JSON body Command for `run-ffmpeg-command`:
   --url https://api.rendi.dev/v1/run-ffmpeg-command \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
-  --data '{ "input_files": 
-    { "in_1": 
-  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "thumbnail1.jpg", "out_2": "thumbnail2.jpg"},
-    "ffmpeg_command": "-i {{in_1}} -filter_complex \"[0:v]split=2[first][second];[first]select='\''gte(t,10)'\''[thumb1];[second]select='\''gte(t,20)'\''[thumb2]\" -map \"[thumb1]\" -frames:v 1 {{out_1}} -map \"[thumb2]\" -frames:v 1 {{out_2}}"}'
+  --data '{
+      "input_files": {
+          "in_img_1": "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
+          "in_img_2": "https://peach.blender.org/wp-content/uploads/rodents.png",
+          "in_img_3": "https://peach.blender.org/wp-content/uploads/evil-frank.png",
+          "in_audio_1": "https://www.fiftysounds.com/music/neon-lights.mp3"
+      },
+      "output_files": {
+          "out_1": "output.mp4"
+      },
+      "ffmpeg_command": "-loop 1 -t 5 -i {{in_img_1}}  -loop 1 -t 5 -i {{in_img_2}} -loop 1 -t 5 -i {{in_img_3}}  -i {{in_audio_1}} -filter_complex \"[0:v][1:v][2:v]concat=n=3:v=1:a=0,format=yuv420p[v]\"  -map \"[v]\" -map 3:a -c:v libx264 -c:a aac -shortest {{out_1}}"
+  }'
   ```
 
   Running this command will return the command\_id:
 
   ```json
   {
-    "command_id": "7f621856-f42a-4e7e-b2f0-806653564a6b"
+    "command_id": "ee3e6960-4fbb-4915-bbb7-3ddfdf5871db"
   }
   ```
 
@@ -243,7 +256,7 @@ Rendi JSON body Command for `run-ffmpeg-command`:
 
   ```bash
   curl --request GET \
-    --url https://api.rendi.dev/v1/poll-command/7f621856-f42a-4e7e-b2f0-806653564a6b \
+    --url https://api.rendi.dev/v1/poll-command/ee3e6960-4fbb-4915-bbb7-3ddfdf5871db \
     --header 'X-API-KEY: <api-key>'
   ```
 
@@ -252,10 +265,9 @@ Rendi JSON body Command for `run-ffmpeg-command`:
   ```json
   {
     "output_files": {
-      "out_1": "https://storage.rendi.dev/7f621856-f42a-4e7e-b2f0-806653564a6b/thumbnail1.jpg",
-      "out_2": "https://storage.rendi.dev/7f621856-f42a-4e7e-b2f0-806653564a6b/thumbnail2.jpg",
+      "out_1": "https://storage.rendi.dev/ee3e6960-4fbb-4915-bbb7-3ddfdf5871db/output.mp4",
     },
-    "processing_seconds": 0.88,
+    "processing_seconds": 1.49,
     "status": "SUCCESS"
   }
   ```
