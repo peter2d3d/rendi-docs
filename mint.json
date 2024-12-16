@@ -30,7 +30,7 @@
       "name": "API Reference",
       "url": "api-reference"
     },
-	{
+    {
       "name": "API Reference Sample",
       "url": "api-reference-sample"
     }
@@ -65,10 +65,10 @@
       "pages": [
         "api-reference/endpoint/run-ffmpeg-command",
         "api-reference/endpoint/poll-command",
-		"api-reference/endpoint/run-multiple-ffmpeg-commands"
+        "api-reference/endpoint/run-multiple-ffmpeg-commands"
       ]
     },
-	{
+    {
       "group": "API Documentation Sample",
       "pages": [
         "api-reference-sample/introduction"
@@ -85,17 +85,17 @@
   ],
   "analytics": {
     "ga4": {
-        "measurementId": "G-TX18XXSKL8"
+      "measurementId": "G-TX18XXSKL8"
     },
     "gtm": {
-        "tagId": "GTM-5W22J25L"
+      "tagId": "GTM-5W22J25L"
     },
     "hotjar": {
-        "hjid": "5186749",
-        "hjsv": "6"
+      "hjid": "5186749",
+      "hjsv": "6"
     },
     "mixpanel": {
-        "projectToken": "28dc0233f8ad77a5de6722a2dddabaf5"
+      "projectToken": "28dc0233f8ad77a5de6722a2dddabaf5"
     }
   }
 }
