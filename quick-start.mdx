@@ -2,7 +2,6 @@
 title: "Quickstart"
 ---
 
-
 ## Register to Rendi, activate you account and get your API key
 
 ### [Registration Link](https://www.rendi.dev/#get-started)
@@ -25,10 +24,10 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
   --data '{ "input_files": 
-    { "input1": 
+    { "in_1": 
 "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"output1": "output.mp4"},
-    "ffmpeg_command": "-i {{input1}} -ss 00:00 -to 00:10 {{output1}}"}'
+    "output_files": {"out_1": "output.mp4"},
+    "ffmpeg_command": "-i {{in_1}} -ss 00:00 -to 00:10 {{out_1}}"}'
 ```
 
 Running this command will return the command\_id:
@@ -54,7 +53,7 @@ While processing the command will pass from status `QUEUED ` to `PROCESSING` to 
 ```json
 {
   "output_files": {
-    "output1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
+    "out_1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
   },
   "processing_seconds": 2.37,
   "status": "SUCCESS"
