@@ -2,7 +2,7 @@
 title: "Quickstart"
 ---
 
-Using Rendi is indeed as simple as just using ffmepg locally, but without needing to install anything.
+Using Rendi is indeed as simple as just using FFmpeg locally, but without needing to install anything, just by using RESTful HTTP requests.
 
 ## Register to Rendi, activate you account and get your API key
 
@@ -12,7 +12,7 @@ Using Rendi is indeed as simple as just using ffmepg locally, but without needin
 
 ## Run a command to trim the first 10 seconds of a video
 
-We will want to run the following ffmpeg command:
+We will want to run the following FFmpeg command:
 
 ```bash
 ffmpeg -i https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi -ss 00:00 -to 00:10 output.mp4
@@ -57,6 +57,7 @@ While processing the command will pass from status `QUEUED ` to `PROCESSING` to 
   "output_files": {
     "output1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
   },
+  "processing_seconds": 2.37,
   "status": "SUCCESS"
 }
 ```

@@ -40,7 +40,8 @@
       "group": "Welcome",
       "pages": [
         "quick-start",
-        "why-rendi"
+        "why-rendi",
+        "coming-soon"
       ]
     },
     {
@@ -52,13 +53,6 @@
         "examples/thumbnail",
         "examples/multiple-commands",
         "examples/host-output"
-      ]
-    },
-    {
-      "group": "Coming Soon",
-      "pages": [
-        "coming-soon/api-endpoints",
-        "coming-soon/integrations"
       ]
     },
     {
