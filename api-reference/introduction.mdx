@@ -1,12 +1,54 @@
 ---
 title: "Introduction"
-description: "Example section for showcasing API endpoints"
+description: "About the API"
 ---
 
-## Authentication
+
+
+# RESTful API
+
+We currently only provide the service through a simple RESTful HTTP API, this is in order to keep it as simple as possible, without having you incur any costs of implementation.&#x20;
+
+We want to allow you to easily integrate whatever system you want - python, nodejs, zapier, make, n8n, anything, since everything works with web requests.
+
+# Authentication
 
 All API endpoints are authenticated using an API Key which you get when you activate your account. The API Key needs to be provided as the value of HTTP Header `X-API-KEY` as
 
 ```http
 --header 'X-API-KEY: <RENDI_API_KEY>'
 ```
+
+# Command Structure
+
+We use a simple JSON format to send commands.
+
+## File naming
+
+When sending commands you will notice that you will need to use `{{alias}}` for file placeholders for input and output files.
+
+Input files will need to be sent in the `input_files` dictionary, with each key starting with **'in\_'** prefix, and the value should be an accessible storage endpoint for Rendi to pull files from.
+
+The **'in\_'** prefix is mandatory for Rendi to consider this as a valid input fille.
+
+Output files will similarly be in 'output\_files' dictionary, with each key starting with 'out\_' prefix, and the value is the required output file name, without any folder or path structure. Output files will be places in a Rendi hosted storage and their name will be as you specified.
+
+The **'out\_'** prefix is mandatory for Rendi to consider this as a valid input fille.
+
+Only alpha-numeric characters and '\_' are allowed for output file names, for the file extension a period character is also allowed (e.g. 'output\_1.mp4').
+
+## Reasons for aliasing files instead of providing them directly within the command
+
+* The command itself and its' files are separate entities. For example - you can use the same input files for several commands, or reuse the same command with different inputs and outputs.
+
+* We validate file names and their locations.
+
+* In the future we will allow you to integrate Rendi with your own private storage repositories, and Rendi will need to pull and put files using specific integrations.
+
+
+
+# Output file storage
+
+Currently, output files are stored by Rendi for 24 hours and are provided through a CDN.&#x20;
+
+We do allow special customers to store their files in our storage for longer (and indefinite) periods, and host them through our CDN. If you are interested in this - contact us at [support@rendi.dev](mailto:support@rendi.dev)

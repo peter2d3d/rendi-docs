@@ -55,6 +55,13 @@
       ]
     },
     {
+      "group": "Coming Soon",
+      "pages": [
+        "coming-soon/api-endpoints",
+        "coming-soon/integrations"
+      ]
+    },
+    {
       "group": "API Documentation",
       "pages": [
         "api-reference/introduction"
