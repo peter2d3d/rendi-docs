@@ -5,12 +5,8 @@ description: "Example section for showcasing API endpoints"
 
 ## Authentication
 
-All API endpoints are authenticated using an API Key Bearer tokens and picked up from the specification file.
+All API endpoints are authenticated using an API Key which you get when you activate your account. The API Key needs to be provided as the value of HTTP Header `X-API-KEY` as
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```http
+--header 'X-API-KEY: <RENDI_API_KEY>'
 ```
