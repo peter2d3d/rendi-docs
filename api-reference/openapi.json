@@ -5,20 +5,20 @@
     "description": "API for running FFmpeg in a cloud environment",
     "version": "1.0.0"
   },
-	"servers": [
-		{
-		  "url": "http://api.rendi.dev"
-		}
-	],
- "paths": {
-    "/run-ffmpeg-command": {
+  "servers": [
+    {
+      "url": "https://api.rendi.dev"
+    }
+  ],
+  "paths": {
+    "/v1/run-ffmpeg-command": {
       "post": {
         "tags": [
           "FFmpeg Commands"
         ],
         "summary": "Run FFmpeg Command",
         "description": "Submit an FFmpeg command for processing with input and output file specifications.",
-        "operationId": "run_ffmpeg_command_run_ffmpeg_command_post",
+        "operationId": "run_ffmpeg_command_v1_run_ffmpeg_command_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -71,14 +71,14 @@
         ]
       }
     },
-    "/run-multiple-ffmpeg-commands": {
+    "/v1/run-multiple-ffmpeg-commands": {
       "post": {
         "tags": [
           "FFmpeg Commands"
         ],
         "summary": "Run Multiple FFmpeg Commands",
         "description": "Submit multiple FFmpeg commands based on the same input files for multiple processing.",
-        "operationId": "run_multiple_ffmpeg_commands_run_multiple_ffmpeg_commands_post",
+        "operationId": "run_multiple_ffmpeg_commands_v1_run_multiple_ffmpeg_commands_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -128,14 +128,14 @@
         ]
       }
     },
-    "/poll-command/{command_id}": {
+    "/v1/poll-command/{command_id}": {
       "get": {
         "tags": [
           "FFmpeg Commands"
         ],
         "summary": "Get Command Status",
         "description": "Get the status of a previously submitted FFmpeg command.",
-        "operationId": "poll_command_poll_command__command_id__get",
+        "operationId": "poll_command_v1_poll_command__command_id__get",
         "security": [
           {
             "APIKeyHeader": []
@@ -211,9 +211,10 @@
       "CommandStatus": {
         "type": "string",
         "enum": [
-          "PENDING",
+          "QUEUED",
           "PROCESSING",
           "FAILED",
+          "FAULTY_COMMAND",
           "SUCCESS",
           "TIME_OUT",
           "QUOTA_EXCEEDED"
@@ -250,13 +251,19 @@
             "title": "Output Files",
             "description": "Dictionary mapping file aliases to their output file storage",
             "example": {
-              "output1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
+              "out_1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
             }
           },
           "status": {
             "$ref": "#/components/schemas/CommandStatus",
             "description": "Current status of the FFmpeg command",
             "example": "SUCCESS"
+          },
+          "processing_seconds": {
+            "type": "number",
+            "title": "Processing Seconds",
+            "description": "Processing time, in seconds, since recieved the command",
+            "default": 0
           }
         },
         "type": "object",
@@ -266,8 +273,9 @@
         "title": "CommandStatusResponse",
         "example": {
           "output_files": {
-            "output1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
+            "out_1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
           },
+          "processing_seconds": 2.37,
           "status": "SUCCESS"
         }
       },
@@ -279,10 +287,10 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their storage paths",
+            "description": "Dictionary mapping file aliases to their storage paths, keys must start with 'in_'",
             "example": {
-              "input1": "s3://public-bucket/videos/first-video.mp4",
-              "input2": "s3://public-bucket/videos/second-video.mp4"
+              "in_1": "s3://public-bucket/videos/first-video.mp4",
+              "in_2": "s3://public-bucket/videos/second-video.mp4"
             }
           },
           "output_files": {
@@ -291,17 +299,17 @@
             },
             "type": "object",
             "title": "Output Files",
-            "description": "Dictionary mapping file aliases to their desired output file names",
+            "description": "Dictionary mapping file aliases to their desired output file names, keys must start with 'out_'",
             "example": {
-              "output1": "output_one.mp4",
-              "output2": "output_two.mp4"
+              "out_1": "output_one.mp4",
+              "out_2": "output_two.mp4"
             }
           },
           "ffmpeg_command": {
             "type": "string",
             "title": "Ffmpeg Command",
             "description": "FFmpeg command string using {{alias}} placeholders for input and output files",
-            "example": "-i {{input1}} -i {{input2}} -filter_complex '[0:v][1:v]hstack=inputs=2[v]' -map '[v]' {{output1}}"
+            "example": "-i {{in_1}} -i {{in_2}} -filter_complex '[0:v][1:v]hstack=inputs=2[v]' -map '[v]' {{out_1}}"
           }
         },
         "type": "object",
@@ -312,13 +320,13 @@
         ],
         "title": "FFmpegCommandRequest",
         "example": {
-          "ffmpeg_command": "-i {{input1}} -i {{input2}} -filter_complex '[0:v][1:v]hstack=inputs=2[v]' -map '[v]' {{output1}}",
+          "ffmpeg_command": "-i {{in_1}} -i {{in_2}} -filter_complex '[0:v][1:v]hstack=inputs=2[v]' -map '[v]' {{out_1}}",
           "input_files": {
-            "input1": "s3://public-bucket/videos/first-video.mp4",
-            "input2": "s3://public-bucket/videos/second-video.mp4"
+            "in_1": "s3://public-bucket/videos/first-video.mp4",
+            "in_2": "s3://public-bucket/videos/second-video.mp4"
           },
           "output_files": {
-            "output1": "output.mp4"
+            "out_1": "output.mp4"
           }
         }
       },
@@ -330,10 +338,10 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their storage paths",
+            "description": "Dictionary mapping file aliases to their storage paths, keys must start with 'in_'",
             "example": {
-              "input1": "s3://public-bucket/videos/first-video.mp4",
-              "input2": "s3://public-bucket/videos/second-video.mp4"
+              "in_1": "s3://public-bucket/videos/first-video.mp4",
+              "in_2": "s3://public-bucket/videos/second-video.mp4"
             }
           },
           "output_files": {
@@ -342,10 +350,10 @@
             },
             "type": "object",
             "title": "Output Files",
-            "description": "Dictionary mapping file aliases to their desired output file names",
+            "description": "Dictionary mapping file aliases to their desired output file names, keys must start with 'out_'",
             "example": {
-              "output1": "output_one.mp4",
-              "output2": "output_two.mp4"
+              "out_1": "output_one.mp4",
+              "out_2": "output_two.mp4"
             }
           },
           "ffmpeg_commands": {
@@ -356,8 +364,8 @@
             "title": "Ffmpeg Commands",
             "description": "FFmpeg commands list of strings using {{alias}} placeholders for input and output files",
             "example": [
-              "-i {{input1}} -vf scale=1280:720 {{output1}}",
-              "-i {{input1}} -vf scale=1920:1080 {{output2}}"
+              "-i {{in_1}} -vf scale=1280:720 {{out_1}}",
+              "-i {{in_1}} -vf scale=1920:1080 {{out_2}}"
             ]
           }
         },
@@ -370,15 +378,15 @@
         "title": "FFmpegMutiplieCommandsRequest",
         "example": {
           "ffmpeg_commands": [
-            "-i {{input1}} -vf scale=1280:720 {{output1}}",
-            "-i {{input1}} -vf scale=1920:1080 {{output2}}"
+            "-i {{in_1}} -vf scale=1280:720 {{out_1}}",
+            "-i {{in_1}} -vf scale=1920:1080 {{out_2}}"
           ],
           "input_files": {
-            "input1": "s3://public-bucket/videos/input-video.mp4"
+            "in_1": "s3://public-bucket/videos/input-video.mp4"
           },
           "output_files": {
-            "output1": "output_720.mp4",
-            "output2": "output_1080.mp4"
+            "out_1": "output_720.mp4",
+            "out_2": "output_1080.mp4"
           }
         }
       },
