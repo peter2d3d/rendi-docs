@@ -20,7 +20,7 @@ ffmpeg -i https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_
 
 ```bash
 curl --request POST \
-  --url http://api.rendi.dev/run-ffmpeg-command \
+  --url https://api.rendi.dev/v1/run-ffmpeg-command \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
   --data '{ "input_files": 
@@ -44,7 +44,7 @@ The command now runs in Rendi and you can check its' status:
 
 ```bash
 curl --request GET \
-  --url http://api.rendi.dev/poll-command/{command_id} \
+  --url https://api.rendi.dev/v1/poll-command/{command_id} \
   --header 'X-API-KEY: <api-key>'
 ```
 
