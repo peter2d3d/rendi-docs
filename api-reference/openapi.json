@@ -11,9 +11,163 @@
     }
   ],
   "paths": {
+    "/v1/poll-command/{command_id}": {
+      "get": {
+        "tags": [
+          "API",
+          "FFmpeg Commands"
+        ],
+        "summary": "Get Command Status",
+        "description": "Get the status of a previously submitted FFmpeg command.",
+        "operationId": "poll_command_v1_poll_command__command_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "command_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The UUID of the FFmpeg command to check status for",
+              "title": "Command Id"
+            },
+            "description": "The UUID of the FFmpeg command to check status for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/commands/{command_id}/files": {
+      "delete": {
+        "tags": [
+          "API"
+        ],
+        "summary": "Delete Command Files",
+        "description": "Delete all output files associated with a command",
+        "operationId": "delete_command_files_v1_commands__command_id__files_delete",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "command_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Command Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Command not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/get-quota": {
+      "get": {
+        "tags": [
+          "API",
+          "Account"
+        ],
+        "summary": "Get User Quota",
+        "description": "Get the current accounts's FFmpeg processing quota and usage - both current and historic",
+        "operationId": "get_quota_v1_get_quota_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotaResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
     "/v1/run-ffmpeg-command": {
       "post": {
         "tags": [
+          "API",
           "FFmpeg Commands"
         ],
         "summary": "Run FFmpeg Command",
@@ -71,19 +225,20 @@
         ]
       }
     },
-    "/v1/run-multiple-ffmpeg-commands": {
+    "/v1/run-chained-ffmpeg-commands": {
       "post": {
         "tags": [
+          "API",
           "FFmpeg Commands"
         ],
-        "summary": "Run Multiple FFmpeg Commands",
-        "description": "Submit multiple FFmpeg commands based on the same input files for multiple processing.",
-        "operationId": "run_multiple_ffmpeg_commands_v1_run_multiple_ffmpeg_commands_post",
+        "summary": "Run Chained FFmpeg Commands which are dependent on each other",
+        "description": "(Endpoint in construction - talk to us for early access at support@rendi.dev)\n        Submit multiple FFmpeg commands where following commands are dependent on output of previous commands.         Running chained FFmpeg commands is faster than running each command seperately because we re-use system         and network resources between the multiple ffmpeg commands",
+        "operationId": "run_chained_ffmpeg_commands_v1_run_chained_ffmpeg_commands_post",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FFmpegMutiplieCommandsRequest"
+                "$ref": "#/components/schemas/FFmpegChainedCommandsRequest"
               }
             }
           },
@@ -95,7 +250,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MultipleCommandsResponse"
+                  "$ref": "#/components/schemas/CommandsResponse"
                 }
               }
             }
@@ -128,40 +283,32 @@
         ]
       }
     },
-    "/v1/poll-command/{command_id}": {
-      "get": {
+    "/v1/run-multiple-ffmpeg-commands": {
+      "post": {
         "tags": [
+          "API",
           "FFmpeg Commands"
         ],
-        "summary": "Get Command Status",
-        "description": "Get the status of a previously submitted FFmpeg command.",
-        "operationId": "poll_command_v1_poll_command__command_id__get",
-        "security": [
-          {
-            "APIKeyHeader": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "command_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid",
-              "description": "The UUID of the FFmpeg command to check status for",
-              "title": "Command Id"
-            },
-            "description": "The UUID of the FFmpeg command to check status for"
-          }
-        ],
+        "summary": "Run Multiple FFmpeg Commands",
+        "description": "(Endpoint in construction - talk to us for early access at support@rendi.dev)\nSubmit multiple FFmpeg commands based on the same input files for multiple processing.     Running multiple FFmpeg commands is faster than running each command seperately because we re-use system     and network resources between the multiple ffmpeg commands",
+        "operationId": "run_multiple_ffmpeg_commands_v1_run_multiple_ffmpeg_commands_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FFmpegMutiplieCommandsRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CommandStatusResponse"
+                  "$ref": "#/components/schemas/CommandsResponse"
                 }
               }
             }
@@ -186,44 +333,70 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
       }
     }
   },
   "components": {
     "schemas": {
-      "CommandResponse": {
+      "CommandOutputFile": {
         "properties": {
-          "command_id": {
+          "file_id": {
             "type": "string",
-            "format": "uuid",
-            "title": "Command Id",
-            "description": "Unique identifier for the submitted FFmpeg command",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          }
-        },
-        "type": "object",
-        "required": [
-          "command_id"
-        ],
-        "title": "CommandResponse"
-      },
-      "CommandStatus": {
-        "type": "string",
-        "enum": [
-          "QUEUED",
-          "PROCESSING",
-          "FAILED",
-          "FAULTY_COMMAND",
-          "SUCCESS",
-          "TIME_OUT",
-          "QUOTA_EXCEEDED"
-        ],
-        "title": "CommandStatus"
-      },
-      "CommandStatusResponse": {
-        "properties": {
-          "error_details": {
+            "title": "File Id",
+            "description": "Unique identifier for the output file",
+            "example": "987fcdeb-a89b-43d3-b456-789012345678"
+          },
+          "req_name": {
+            "type": "string",
+            "title": "Req Name",
+            "description": "Name/alias of the output file as specified in the request",
+            "example": "out_1"
+          },
+          "req_path": {
+            "type": "string",
+            "title": "Req Path",
+            "description": "Output file path as specified in the request",
+            "example": "output.avi"
+          },
+          "size_mbytes": {
+            "type": "number",
+            "title": "Size Mbytes",
+            "description": "Size of the output file in megabytes",
+            "example": 15.2
+          },
+          "is_deleted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Deleted",
+            "description": "Whether the file has been deleted",
+            "example": false
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration",
+            "description": "Duration of the media file in seconds",
+            "example": 30.5
+          },
+          "file_type": {
             "anyOf": [
               {
                 "type": "string"
@@ -232,15 +405,198 @@
                 "type": "null"
               }
             ],
-            "title": "Error Details",
+            "title": "File Type",
+            "description": "Type of the media file (video, audio, image, subtitles, etc.)",
+            "example": "video"
+          },
+          "file_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Format",
+            "description": "Format/container of the media file",
+            "example": "avi"
+          },
+          "storage_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storage Url",
+            "description": "URL where the output file is stored",
+            "example": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.avi"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width",
+            "description": "Width of the video in pixels",
+            "example": 1920
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height",
+            "description": "Height of the video in pixels",
+            "example": 1080
+          },
+          "codec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codec",
+            "description": "Codec used for the media file",
+            "example": "msmpeg4v2"
+          },
+          "frame_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frame Rate",
+            "description": "Frame rate of the video in frames per second",
+            "example": 30.0
+          },
+          "bitrate_video_kb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate Video Kb",
+            "description": "Video bitrate in kilobits per second",
+            "example": 4000.0
+          },
+          "bitrate_audio_kb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate Audio Kb",
+            "description": "Audio bitrate in kilobits per second",
+            "example": 128.0
+          },
+          "is_varying_frame_rate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Varying Frame Rate",
+            "description": "Whether the video has a variable frame rate",
+            "example": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "file_id",
+          "req_name",
+          "req_path",
+          "size_mbytes"
+        ],
+        "title": "CommandOutputFile",
+        "description": "Represents an output file generated by running a command.\n\nThis model contains metadata about files produced by the command, including file details,\nmedia information, and storage location."
+      },
+      "CommandResponse": {
+        "properties": {
+          "command_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Command Id",
+            "description": "Unique identifier for the submitted command",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          }
+        },
+        "type": "object",
+        "required": [
+          "command_id"
+        ],
+        "title": "CommandResponse",
+        "description": "Response model for command submission.\n\nContains the unique identifier assigned to the submitted command that can be used\nto poll for status and retrieve results."
+      },
+      "CommandStatus": {
+        "type": "string",
+        "enum": [
+          "QUEUED",
+          "PROCESSING",
+          "FAILED",
+          "SUCCESS"
+        ],
+        "title": "CommandStatus"
+      },
+      "CommandStatusResponse": {
+        "properties": {
+          "error_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Status",
+            "description": "Status of any error that occurred during command execution",
+            "example": "UNREACHABLE_INPUT_FILE"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message",
             "description": "Error details if the command failed",
-            "example": "Command failed to complete"
+            "example": "Input file url https://rendi.dev/example does not have a valid file name in its' end."
           },
           "output_files": {
             "anyOf": [
               {
                 "additionalProperties": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/CommandOutputFile"
                 },
                 "type": "object"
               },
@@ -251,7 +607,24 @@
             "title": "Output Files",
             "description": "Dictionary mapping file aliases to their output file storage",
             "example": {
-              "out_1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
+              "out_1": {
+                "bitrate_audio_kb": 128.0,
+                "bitrate_video_kb": 4000.0,
+                "codec": "msmpeg4v2",
+                "duration": 30.5,
+                "file_format": "avi",
+                "file_id": "987fcdeb-a89b-43d3-b456-789012345678",
+                "file_type": "video",
+                "frame_rate": 30.0,
+                "height": 1080,
+                "is_deleted": false,
+                "is_varying_frame_rate": false,
+                "req_name": "out_1",
+                "req_path": "output.avi",
+                "size_mbytes": 15.2,
+                "storage_url": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/987fcdeb-a89b-43d3-b456-789012345678/output.avi",
+                "width": 1920
+              }
             }
           },
           "status": {
@@ -259,24 +632,174 @@
             "description": "Current status of the FFmpeg command",
             "example": "SUCCESS"
           },
+          "original_request": {
+            "type": "object",
+            "title": "Original Request",
+            "description": "The original request that was sent to the server",
+            "example": {
+              "ffmpeg_command": "-i {{in_1}} -ss 00:00 -to 00:10 {{out_1}}",
+              "input_files": {
+                "in_1": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"
+              },
+              "output_files": {
+                "out_1": "output.avi"
+              }
+            }
+          },
+          "ffmpeg_command_run_seconds": {
+            "type": "number",
+            "title": "Ffmpeg Command Run Seconds",
+            "description": "FFMPEG command run time, in seconds",
+            "default": 0.0
+          },
           "processing_seconds": {
             "type": "number",
             "title": "Processing Seconds",
             "description": "Processing time, in seconds, since recieved the command",
-            "default": 0
+            "default": 0.0
           }
         },
         "type": "object",
         "required": [
-          "status"
+          "status",
+          "original_request"
         ],
         "title": "CommandStatusResponse",
+        "description": "Response model for FFmpeg command status.\n\nContains information about the command execution status, any errors that occurred,\noutput files generated, and the original request details.",
         "example": {
+          "original_request": {
+            "ffmpeg_command": "-i {{in_1}} -ss 00:00 -to 00:10 {{out_1}}",
+            "input_files": {
+              "in_1": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"
+            },
+            "output_files": {
+              "out_1": "output.avi"
+            }
+          },
           "output_files": {
-            "out_1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
+            "out_1": {
+              "bitrate_audio_kb": 128.0,
+              "bitrate_video_kb": 4000.0,
+              "codec": "msmpeg4v2",
+              "duration": 30.5,
+              "file_format": "avi",
+              "file_id": "987fcdeb-a89b-43d3-b456-789012345678",
+              "file_type": "video",
+              "frame_rate": 30.0,
+              "height": 1080,
+              "is_deleted": false,
+              "is_varying_frame_rate": false,
+              "req_name": "out_1",
+              "req_path": "output.avi",
+              "size_mbytes": 15.2,
+              "storage_url": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/987fcdeb-a89b-43d3-b456-789012345678/output.avi",
+              "width": 1920
+            }
           },
           "processing_seconds": 2.37,
           "status": "SUCCESS"
+        }
+      },
+      "CommandsResponse": {
+        "properties": {
+          "command_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Command Ids",
+            "description": "List of unique identifiers for the submitted FFmpeg commands, order by original commands order",
+            "example": [
+              "123e4567-e89b-12d3-a456-426614174000",
+              "987fcdeb-a89b-43d3-b456-789012345678"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "command_ids"
+        ],
+        "title": "CommandsResponse",
+        "description": "Response model containing a list of command IDs returned from a batch command submission.\n\nThis model is used to return the unique identifiers for multiple FFmpeg commands that were\nsubmitted together. The command IDs are returned in the same order as the original command\nsubmission order."
+      },
+      "FFmpegChainedCommandsRequest": {
+        "properties": {
+          "input_files": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Input Files",
+            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, keys must start with 'in_'",
+            "example": {
+              "in_1": "s3://public-bucket/videos/first-video.avi",
+              "in_2": "s3://public-bucket/videos/second-video.avi"
+            }
+          },
+          "output_files": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Output Files",
+            "description": "Dictionary mapping file aliases to their desired output file names, keys must start with 'out_'.             Output files can both be used as interm files as input for chained ffmpeg commands.             Unlike interim files, output files will be stored in storage for later access. ",
+            "example": {
+              "out_1": "output_concatenated_1080.avi",
+              "out_2": "thumbnail_1080.jpeg"
+            }
+          },
+          "interim_files": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Interim Files",
+            "description": "These files are used for interm creation and processing between the ffmpeg chains.             This is a dictionary mapping file aliases to their local paths, keys must start with 'inter_'",
+            "example": {
+              "inter_1": "concatenated_video.avi"
+            }
+          },
+          "ffmpeg_chained_commands": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ffmpeg Chained Commands",
+            "description": "FFmpeg commands list of strings using {{alias}} placeholders for input, interim and output files.         The interm files will only be stored on the local machine running FFMPEG",
+            "example": [
+              "-i {{in_1}} -i {{in_2}} -filter_complex '[0:v][1:v]hstack=inputs=2[v]' -map '[v]' {{inter_1}}",
+              "-i {{inter_1}} -vf scale=1920:1080 {{out_1}}",
+              "-i {{out_1}} -ss 00:17 -vframes 1 {{out_2}}"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "input_files",
+          "output_files",
+          "interim_files",
+          "ffmpeg_chained_commands"
+        ],
+        "title": "FFmpegChainedCommandsRequest",
+        "description": "Request model for submitting chained FFmpeg commands.\n\nThis model allows submitting multiple FFmpeg commands that run sequentially, where output files from earlier commands\ncan be used as inputs to later commands. It supports both interim files (temporary) and output files (stored).",
+        "example": {
+          "ffmpeg_chained_commands": [
+            "-i {{in_1}} -i {{in_2}} -filter_complex '[0:v][1:v]hstack=inputs=2[v]' -map '[v]' {{inter_1}}",
+            "-i {{inter_1}} -vf scale=1920:1080 {{out_1}}",
+            "-i {{out_1}} -ss 00:17 -vframes 1 {{out_2}}"
+          ],
+          "input_files": {
+            "in_1": "s3://public-bucket/videos/first-video.avi",
+            "in_2": "s3://public-bucket/videos/second-video.avi"
+          },
+          "interim_files": {
+            "inter_1": "concatenated_video.avi"
+          },
+          "output_files": {
+            "out_1": "output_concatenated_1080.avi",
+            "out_2": "thumbnail_1080.jpeg"
+          }
         }
       },
       "FFmpegCommandRequest": {
@@ -287,10 +810,10 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their storage paths, keys must start with 'in_'",
+            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, keys must start with 'in_'",
             "example": {
-              "in_1": "s3://public-bucket/videos/first-video.mp4",
-              "in_2": "s3://public-bucket/videos/second-video.mp4"
+              "in_1": "s3://public-bucket/videos/first-video.avi",
+              "in_2": "s3://public-bucket/videos/second-video.avi"
             }
           },
           "output_files": {
@@ -301,8 +824,8 @@
             "title": "Output Files",
             "description": "Dictionary mapping file aliases to their desired output file names, keys must start with 'out_'",
             "example": {
-              "out_1": "output_one.mp4",
-              "out_2": "output_two.mp4"
+              "out_1": "output_one.avi",
+              "out_2": "output_two.avi"
             }
           },
           "ffmpeg_command": {
@@ -319,14 +842,15 @@
           "ffmpeg_command"
         ],
         "title": "FFmpegCommandRequest",
+        "description": "Request model for submitting a single FFmpeg command.\n\nThis model allows submitting an FFmpeg command with input and output file specifications.\nInput file aliases must start with 'in_' and direct to a publicly accessible file, and\noutput file aliases must start with 'out_' and only name a file name to be created.",
         "example": {
           "ffmpeg_command": "-i {{in_1}} -i {{in_2}} -filter_complex '[0:v][1:v]hstack=inputs=2[v]' -map '[v]' {{out_1}}",
           "input_files": {
-            "in_1": "s3://public-bucket/videos/first-video.mp4",
-            "in_2": "s3://public-bucket/videos/second-video.mp4"
+            "in_1": "s3://public-bucket/videos/first-video.avi",
+            "in_2": "s3://public-bucket/videos/second-video.avi"
           },
           "output_files": {
-            "out_1": "output.mp4"
+            "out_1": "output.avi"
           }
         }
       },
@@ -338,10 +862,10 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their storage paths, keys must start with 'in_'",
+            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, keys must start with 'in_'",
             "example": {
-              "in_1": "s3://public-bucket/videos/first-video.mp4",
-              "in_2": "s3://public-bucket/videos/second-video.mp4"
+              "in_1": "s3://public-bucket/videos/first-video.avi",
+              "in_2": "s3://public-bucket/videos/second-video.avi"
             }
           },
           "output_files": {
@@ -352,8 +876,8 @@
             "title": "Output Files",
             "description": "Dictionary mapping file aliases to their desired output file names, keys must start with 'out_'",
             "example": {
-              "out_1": "output_one.mp4",
-              "out_2": "output_two.mp4"
+              "out_1": "output_one.avi",
+              "out_2": "output_two.avi"
             }
           },
           "ffmpeg_commands": {
@@ -376,17 +900,18 @@
           "ffmpeg_commands"
         ],
         "title": "FFmpegMutiplieCommandsRequest",
+        "description": "Request model for submitting multiple FFmpeg commands.\n\nThis model allows submitting multiple FFmpeg commands that run in parallel, where each command can use the same input files\nto generate different output files. For example, this can be used to generate multiple versions of a video with different\nresolutions or formats in a single request.",
         "example": {
           "ffmpeg_commands": [
             "-i {{in_1}} -vf scale=1280:720 {{out_1}}",
             "-i {{in_1}} -vf scale=1920:1080 {{out_2}}"
           ],
           "input_files": {
-            "in_1": "s3://public-bucket/videos/input-video.mp4"
+            "in_1": "s3://public-bucket/videos/input-video.avi"
           },
           "output_files": {
-            "out_1": "output_720.mp4",
-            "out_2": "output_1080.mp4"
+            "out_1": "output_720.avi",
+            "out_2": "output_1080.avi"
           }
         }
       },
@@ -403,27 +928,100 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "MultipleCommandsResponse": {
+      "QuotaPeriod": {
         "properties": {
-          "command_ids": {
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "type": "array",
-            "title": "Command Ids",
-            "description": "List of unique identifiers for the submitted FFmpeg commands, order by original commands order",
-            "example": [
-              "123e4567-e89b-12d3-a456-426614174000",
-              "987fcdeb-a89b-43d3-b456-789012345678"
-            ]
+          "start_period": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Period",
+            "description": "Start date of the quota period",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "end_period": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Period",
+            "description": "End date of the quota period. None if period is ongoing",
+            "example": "2024-02-01T00:00:00Z"
+          },
+          "processing_gb_quota_used": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Processing Gb Quota Used",
+            "description": "Amount of processing quota used in GB",
+            "example": 12.5
+          },
+          "quota_processing_gb": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Quota Processing Gb",
+            "description": "Total processing quota limit in GB",
+            "example": 100.0
+          },
+          "storage_gb_quota_used": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Storage Gb Quota Used",
+            "description": "Amount of storage quota used in GB",
+            "example": 5.2
+          },
+          "quota_storage_gb": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Quota Storage Gb",
+            "description": "Total storage quota limit in GB",
+            "example": 50.0
+          },
+          "max_command_run_minutes": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Max Command Run Minutes",
+            "description": "Maximum allowed runtime in minutes for a single FFmpeg command",
+            "example": 15.0
           }
         },
         "type": "object",
         "required": [
-          "command_ids"
+          "start_period",
+          "end_period",
+          "processing_gb_quota_used",
+          "quota_processing_gb",
+          "storage_gb_quota_used",
+          "quota_storage_gb",
+          "max_command_run_minutes"
         ],
-        "title": "MultipleCommandsResponse"
+        "title": "QuotaPeriod",
+        "description": "Model representing quota usage and limits for a specific time period.\n\nContains information about processing, storage and command runtime quotas and their usage\nfor a given time period defined by start and end dates."
+      },
+      "QuotaResponse": {
+        "properties": {
+          "current_quota": {
+            "$ref": "#/components/schemas/QuotaPeriod",
+            "description": "Quota usage and limits for the current period"
+          },
+          "historic_quota": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/QuotaPeriod"
+            },
+            "type": "object",
+            "title": "Historic Quota",
+            "description": "Historical quota data mapped by period start/end dates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_quota",
+          "historic_quota"
+        ],
+        "title": "QuotaResponse",
+        "description": "Response model containing quota information for both current and historical periods."
       },
       "ValidationError": {
         "properties": {
