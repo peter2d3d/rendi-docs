@@ -98,7 +98,7 @@ On `SUCCESS`
 
 </Accordion>
 
-# Create several trimmed videos with different resolutions
+# Create several videos with different resolutions
 
 Rendi JSON body Command for `run-ffmpeg-command`:
 
@@ -203,6 +203,90 @@ On `SUCCESS`
 
 </Accordion>
 
+# Generate thumbnail + GIF using multiple commands
+
+Rendi JSON body Command for `run-ffmpeg-commands`:
+
+```json
+{
+  "input_files": {
+    "in_1": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"
+  },
+  "output_files": { "out_1": "thumbnail.jpg", "out_2": "output.gif" },
+  "ffmpeg_commands": [
+    "-i {{in_1}} -ss 00:17 -vframes 1 {{out_1}}",
+    "-i {{in_1}} -vf select='lte(n\\,1)+gt(trunc(t/10),trunc(prev_t/10))',setpts='PTS*0.1',scale=trunc(oh*a/2)*2:80:force_original_aspect_ratio=decrease, pad=trunc(oh*a/2)*2:80:-1:-1 -an -vsync vfr {{out_2}}"
+  ]
+}
+```
+
+<Accordion title="RESTful queries">
+  ```bash
+  curl --request POST \
+    --url https://api.rendi.dev/v1/run-ffmpeg-commands \
+    --header 'Content-Type: application/json' \
+    --header 'X-API-KEY: <api-key>' \
+    --data '{ "input_files": 
+      { "in_1": 
+  "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
+      "output_files": {"out_1": "thumbnail.jpg", "out_2": "output.gif"},
+      "ffmpeg_commands": ["-i {{in_1}} -ss 00:17 -vframes 1 {{out_1}}", "-i {{in_1}} -vf select='\''lte(n\\,1)+gt(trunc(t/10),trunc(prev_t/10))'\'',setpts='\''PTS*0.1'\'',scale=trunc(oh*a/2)*2:80:force_original_aspect_ratio=decrease, pad=trunc(oh*a/2)*2:80:-1:-1 -an -vsync vfr {{out_2}}"]}'
+  ```
+
+Running this command will return the command_id:
+
+```json
+{
+  "command_ids": [
+    "3c93f6eb-5df6-45ce-ad47-83261804e093",
+    "8c5148d8-8b00-4b01-a906-7c57880adf34"
+  ]
+}
+```
+
+Poll result of thumbnail:
+
+```bash
+curl --request GET \
+  --url https://api.rendi.dev/v1/poll-command/3c93f6eb-5df6-45ce-ad47-83261804e093 \
+  --header 'X-API-KEY: <api-key>'
+```
+
+On `SUCCESS`
+
+```json
+{
+  "output_files": {
+    "out_1": "https://storage.rendi.dev/3c93f6eb-5df6-45ce-ad47-83261804e093/thmbnail.jpg"
+  },
+  "processing_seconds": 0.49,
+  "status": "SUCCESS"
+}
+```
+
+Poll result of gif:
+
+```bash
+
+curl --request GET \
+ --url https://api.rendi.dev/v1/poll-command/8c5148d8-8b00-4b01-a906-7c57880adf34 \
+ --header 'X-API-KEY: <api-key>'
+```
+
+On `SUCCESS`
+
+```json
+{
+  "output_files": {
+    "out_1": "https://storage.rendi.dev/8c5148d8-8b00-4b01-a906-7c57880adf34/output.gif"
+  },
+  "processing_seconds": 5.81,
+  "status": "SUCCESS"
+}
+```
+
+</Accordion>
+
 # Combine images with audio to create a video
 
 Rendi JSON body Command for `run-ffmpeg-command`:
@@ -210,15 +294,15 @@ Rendi JSON body Command for `run-ffmpeg-command`:
 ```json
 {
   "input_files": {
-    "in_img_1": "https://storage.rendi.dev/sample/bbb-splash.png",
-    "in_img_2": "https://storage.rendi.dev/sample/rodents.png",
-    "in_img_3": "https://storage.rendi.dev/sample/evil-frank.png",
-    "in_audio_1": "https://storage.rendi.dev/sample/Neon%20Lights.mp3"
+    "in_img_1": "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
+    "in_img_2": "https://peach.blender.org/wp-content/uploads/rodents.png",
+    "in_img_3": "https://peach.blender.org/wp-content/uploads/evil-frank.png",
+    "in_audio_1": "https://www.fiftysounds.com/music/neon-lights.mp3"
   },
   "output_files": {
     "out_1": "output.mp4"
   },
-  "ffmpeg_command": "-loop 1 -t 5 -i {{in_img_1}}  -loop 1 -t 5 -i {{in_img_2}} -loop 1 -t 5 -i {{in_img_3}}  -i {{in_audio_1}} -filter_complex [0:v][1:v][2:v]concat=n=3:v=1:a=0,format=yuv420p[v]  -map [v] -map 3:a -c:v libx264 -c:a aac -shortest {{out_1}}"
+  "ffmpeg_command": "-loop 1 -t 5 -i {{in_img_1}}  -loop 1 -t 5 -i {{in_img_2}} -loop 1 -t 5 -i {{in_img_3}}  -i {{in_audio_1}} -filter_complex \"[0:v][1:v][2:v]concat=n=3:v=1:a=0,format=yuv420p[v]\"  -map \"[v]\" -map 3:a -c:v libx264 -c:a aac -shortest {{out_1}}"
 }
 ```
 
@@ -231,16 +315,16 @@ curl --request POST \
 --header 'Content-Type: application/json' \
 --header 'X-API-KEY: <api-key>' \
 --data '{
-  "input_files": {
-    "in_img_1": "https://storage.rendi.dev/sample/bbb-splash.png",
-    "in_img_2": "https://storage.rendi.dev/sample/rodents.png",
-    "in_img_3": "https://storage.rendi.dev/sample/evil-frank.png",
-    "in_audio_1": "https://storage.rendi.dev/sample/Neon%20Lights.mp3"
-  },
-  "output_files": {
-    "out_1": "output.mp4"
-  },
-  "ffmpeg_command": "-loop 1 -t 5 -i {{in_img_1}}  -loop 1 -t 5 -i {{in_img_2}} -loop 1 -t 5 -i {{in_img_3}}  -i {{in_audio_1}} -filter_complex [0:v][1:v][2:v]concat=n=3:v=1:a=0,format=yuv420p[v]  -map [v] -map 3:a -c:v libx264 -c:a aac -shortest {{out_1}}"
+    "input_files": {
+        "in_img_1": "https://peach.blender.org/wp-content/uploads/bbb-splash.png",
+        "in_img_2": "https://peach.blender.org/wp-content/uploads/rodents.png",
+        "in_img_3": "https://peach.blender.org/wp-content/uploads/evil-frank.png",
+        "in_audio_1": "https://www.fiftysounds.com/music/neon-lights.mp3"
+    },
+    "output_files": {
+        "out_1": "output.mp4"
+    },
+    "ffmpeg_command": "-loop 1 -t 5 -i {{in_img_1}}  -loop 1 -t 5 -i {{in_img_2}} -loop 1 -t 5 -i {{in_img_3}}  -i {{in_audio_1}} -filter_complex \"[0:v][1:v][2:v]concat=n=3:v=1:a=0,format=yuv420p[v]\"  -map \"[v]\" -map 3:a -c:v libx264 -c:a aac -shortest {{out_1}}"
 }'
 ```
 
@@ -248,7 +332,7 @@ Running this command will return the command_id:
 
 ```json
 {
-  "command_id": "644c1ce5-57a5-423d-9b55-052fb087674e"
+  "command_id": "ee3e6960-4fbb-4915-bbb7-3ddfdf5871db"
 }
 ```
 
@@ -256,7 +340,7 @@ Poll result:
 
 ```bash
 curl --request GET \
-  --url https://api.rendi.dev/v1/commands/644c1ce5-57a5-423d-9b55-052fb087674e \
+  --url https://api.rendi.dev/v1/poll-command/ee3e6960-4fbb-4915-bbb7-3ddfdf5871db \
   --header 'X-API-KEY: <api-key>'
 ```
 
@@ -265,41 +349,12 @@ On `SUCCESS`
 ```json
 {
   "output_files": {
-    "out_1": {
-      "file_id": "10cfed0c-f25f-4b29-a58d-ffa563bc57e8",
-      "size_mbytes": 1.0871257781982422,
-      "duration": 15.001,
-      "file_type": "video",
-      "file_format": "mp4",
-      "storage_url": "https://storage.rendi.dev/temp_files/224ea098-5c10-419b-8a77-707d89443c56/644c1ce5-57a5-423d-9b55-052fb087674e/output.mp4",
-      "width": 1920,
-      "height": 1080,
-      "codec": "h264",
-      "frame_rate": 25.0,
-      "bitrate_video_kb": 453.5546875,
-      "bitrate_audio_kb": 132.6640625,
-      "is_varying_frame_rate": false
-    }
+    "out_1": "https://storage.rendi.dev/ee3e6960-4fbb-4915-bbb7-3ddfdf5871db/output.mp4"
   },
-  "status": "SUCCESS",
-  "original_request": {
-    "input_files": {
-      "in_img_1": "https://storage.rendi.dev/sample/bbb-splash.png",
-      "in_img_2": "https://storage.rendi.dev/sample/rodents.png",
-      "in_img_3": "https://storage.rendi.dev/sample/evil-frank.png",
-      "in_audio_1": "https://storage.rendi.dev/sample/Neon%20Lights.mp3"
-    },
-    "output_files": {
-      "out_1": "output.mp4"
-    },
-    "ffmpeg_command": "-loop 1 -t 5 -i {{in_img_1}}  -loop 1 -t 5 -i {{in_img_2}} -loop 1 -t 5 -i {{in_img_3}}  -i {{in_audio_1}} -filter_complex [0:v][1:v][2:v]concat=n=3:v=1:a=0,format=yuv420p[v]  -map [v] -map 3:a -c:v libx264 -c:a aac -shortest {{out_1}}"
-  },
-  "ffmpeg_command_run_seconds": 6.009521722793579,
-  "total_processing_seconds": 10.877786
+  "processing_seconds": 1.49,
+  "status": "SUCCESS"
 }
 ```
-
-> Music credit to https://www.fiftysounds.com/music/neon-lights.mp3
 
 </Accordion>
 
@@ -310,13 +365,13 @@ Rendi JSON body Command for `run-ffmpeg-command`:
 ```json
 {
   "input_files": {
-    "in_video": "https://storage.rendi.dev/sample/sample.avi",
-    "in_srt": "https://storage.rendi.dev/sample/subtitles.srt"
+    "in_video": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi",
+    "in_srt": "https://storage.rendi.dev/samples/subtitles.srt"
   },
   "output_files": {
-    "out_1": "output.avi"
+    "out_1": "output.mp4"
   },
-  "ffmpeg_command": "-i {{in_video}} -ss 00:00 -to 01:00 -vf subtitles={{in_srt}}  {{out_1}}"
+  "ffmpeg_command": "-i {{in_video}} -vf \"subtitles={{in_srt}}\" -c:v libx264 -crf 20 -c:a aac -b:a 192k {{out_1}}"
 }
 ```
 
@@ -329,14 +384,14 @@ curl --request POST \
 --header 'Content-Type: application/json' \
 --header 'X-API-KEY: <api-key>' \
 --data '{
-  "input_files": {
-    "in_video": "https://storage.rendi.dev/sample/sample.avi",
-    "in_srt": "https://storage.rendi.dev/sample/subtitles.srt"
-  },
-  "output_files": {
-    "out_1": "output.avi"
-  },
-  "ffmpeg_command": "-i {{in_video}} -ss 00:00 -to 01:00 -vf subtitles={{in_srt}}  {{out_1}}"
+    "input_files": {
+        "in_video": "https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi",
+        "in_srt": "https://storage.rendi.dev/samples/subtitles.srt"
+    },
+    "output_files": {
+        "out_1": "output.mp4"
+    },
+    "ffmpeg_command": "-i {{in_video}} -vf \"subtitles={{in_srt}}\" -c:v libx264 -crf 20 -c:a aac -b:a 192k {{out_1}}"
 }'
 ```
 
@@ -344,7 +399,7 @@ Running this command will return the command_id:
 
 ```json
 {
-  "command_id": "07e47b04-0fd6-4584-8b72-eaeb3c023cf2"
+  "command_id": "8e965d59-10fd-44b7-b275-1758cc0fe940"
 }
 ```
 
@@ -352,7 +407,7 @@ Poll result:
 
 ```bash
 curl --request GET \
-  --url https://api.rendi.dev/v1/commands/07e47b04-0fd6-4584-8b72-eaeb3c023cf2 \
+  --url https://api.rendi.dev/poll-command/v1/8e965d59-10fd-44b7-b275-1758cc0fe940 \
   --header 'X-API-KEY: <api-key>'
 ```
 
@@ -361,40 +416,11 @@ On `SUCCESS`
 ```json
 {
   "output_files": {
-    "out_1": {
-      "file_id": "557198b1-c063-4093-aed7-86a701046b17",
-      "size_mbytes": 3.3291358947753906,
-      "duration": 60.041667,
-      "file_type": "video",
-      "file_format": "avi",
-      "storage_url": "https://storage.rendi.dev/temp_files/224ea098-5c10-419b-8a77-707d89443c56/07e47b04-0fd6-4584-8b72-eaeb3c023cf2/output.avi",
-      "width": 854,
-      "height": 480,
-      "codec": "mpeg4",
-      "frame_rate": 24.0,
-      "bitrate_video_kb": 315.783203125,
-      "bitrate_audio_kb": 125.0498046875,
-      "is_varying_frame_rate": false
-    }
+    "out_1": "https://storage.rendi.dev/8e965d59-10fd-44b7-b275-1758cc0fe940/output.mp4"
   },
-  "status": "SUCCESS",
-  "original_request": {
-    "input_files": {
-      "in_srt": "https://storage.rendi.dev/sample/subtitles.srt",
-      "in_video": "https://storage.rendi.dev/sample/sample.avi"
-    },
-    "output_files": {
-      "out_1": "output.avi"
-    },
-    "ffmpeg_command": "-i {{in_video}} -ss 00:00 -to 01:00 -vf subtitles={{in_srt}}  {{out_1}}"
-  },
-  "ffmpeg_command_run_seconds": 3.511233329772949,
-  "total_processing_seconds": 7.952778
+  "processing_seconds": 4.88,
+  "status": "SUCCESS"
 }
 ```
 
 </Accordion>
-
-<br />
-
-> Credit to www.bigbuckbunny.org for the video and image files.

@@ -8,21 +8,20 @@ title: "Quickstart"
 
 &#x20;
 
-## Run a command to trim the first 10 seconds of a video
+## Run a command to generate a gif from the first minute of a video
 
 We will want to run the following FFmpeg command:
 
 ```bash
-ffmpeg -i https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi -ss 00:00 -to 00:10 output.mp4
+ffmpeg -i https://storage.rendi.dev/sample/sample.avi -ss 00:00 -to 01:00 -vf select='lte(n\,1)+gt(trunc(t/10),trunc(prev_t/10))',setpts='PTS*0.025',scale=trunc(oh*a/2)*2:160:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:160:-1:-1 -an -vsync vfr output1.gif
 ```
 
 ### Use the same command in Rendi
 
 ```bash
-curl --request POST \
-  --url https://api.rendi.dev/v1/run-ffmpeg-command \
-  --header 'Content-Type: application/json' \
-  --header 'X-API-KEY: <api-key>' \
+curl --location 'https://api.rendi.dev/v1/run-ffmpeg-command' \
+--header 'X-API-KEY: <api-key>' \
+--header 'Content-Type: application/json; charset=utf-8' \
 --data '{
     "input_files": {
         "in_1": "https://storage.rendi.dev/sample/sample.avi"
@@ -38,7 +37,7 @@ Running this command will return the command_id:
 
 ```json
 {
-  "command_id": "123e4567-e89b-12d3-a456-426614174000"
+    "command_id": "e8a035b2-d7d6-424c-8dc4-16247ce1b753"
 }
 ```
 
@@ -56,11 +55,29 @@ While processing the command will pass from status `QUEUED ` to `PROCESSING` to 
 
 ```json
 {
-  "output_files": {
-    "out_1": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.mp4"
-  },
-  "processing_seconds": 2.37,
-  "status": "SUCCESS"
+    "output_files": {
+        "out_1": {
+            "file_id": "7a6dc184-e604-4f2e-96c7-0eec48c41b37",
+            "size_mbytes": 1.0111198425292969,
+            "file_type": "image",
+            "file_format": "gif",
+            "storage_url": "https://storage.rendi.dev/temp_files/224ea098-5c10-419b-8a77-707d89443c56/e8a035b2-d7d6-424c-8dc4-16247ce1b753/output1.gif",
+            "width": 284,
+            "height": 160
+        }
+    },
+    "status": "SUCCESS",
+    "original_request": {
+        "input_files": {
+            "in_1": "https://storage.rendi.dev/sample/sample.avi"
+        },
+        "output_files": {
+            "out_1": "output1.gif"
+        },
+        "ffmpeg_command": "-i {{in_1}} -ss 00:00 -to 01:00 -vf select='lte(n\\,1)+gt(trunc(t/10),trunc(prev_t/10))',setpts='PTS*0.025',scale=trunc(oh*a/2)*2:160:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:160:-1:-1 -an -vsync vfr {{out_1}}"
+    },
+    "ffmpeg_command_run_seconds": 5.489778280258179,
+    "total_processing_seconds": 13.24095
 }
 ```
 
