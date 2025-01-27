@@ -3,24 +3,51 @@ title: "Coming Soon"
 description: "Rendi is constantly evolving and developing the hosted FFmpeg capabilities"
 ---
 
-# Webhooks
+<br />
 
-Instead of having you poll for status of commands, each command will deliver a webhook even once it is done (successfully or failed). The same details will be sent as the polling request - command\_id, output files, failure reason (if applicable), running time.
+## Webhooks
+
+Instead of having you poll for status of commands, each command will deliver a webhook even once it is done (successfully or failed). The same details will be sent as the polling request - command_id, output files, failure reason (if applicable), running time.
 
 You could use these webhook especially for ease of integration to no-code or low-code solutions where polling is less comfortable - such as Zapier, Make etc.
 
-# Linked commands
+<br />
+
+## Storing input files for reuse
+
+We will allow you to store input files for reuse. This will allow you to run commands without waiting for network to download files, making the process faster.
+
+<br />
+
+## Uploading input files via Post request
+
+We will allow you to upload input files via a `multipart/form-data` POST request. This will enable you to not use a public storage for your input files.
+
+<br />
+
+## Archive files
+
+We will allow you to archive both input and output files as a flag in the command request.
+
+This will allow for faster network traffic both when we download files and when we upload them, making the process faster.
+
+<br />
+## Linked commands
 
 Sometimes we run FFmpeg to create another video, and from that output video we want to create a gif or a thumbnail.&#x20;
 
 We will allow you to specify a new type of command - `Linked Command` - where you could stack FFmpeg commands to do just that.
 
-# Zapier and Make integrations
+<br />
+
+## Zapier and Make integrations
 
 Currently you can integrate Rendi with Zapier and Make through RESTful requests.
 
 We are working on native Zapier and Make integrations that will allow you to send commands and receive notifications via webhooks without handling the RESTful integration.
 
-# Contact us for requests
+<br />
+
+## Contact us for requests
 
 Want us to prioritize a feature? Have another feature in mind that you would like us to implement - contact us at [support@rendi.dev](mailto:support@rendi.dev)&#x20;

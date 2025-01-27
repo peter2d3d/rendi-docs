@@ -23,14 +23,18 @@ curl --request POST \
   --url https://api.rendi.dev/v1/run-ffmpeg-command \
   --header 'Content-Type: application/json' \
   --header 'X-API-KEY: <api-key>' \
-  --data '{ "input_files": 
-    { "in_1": 
-"https://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_720p_stereo.avi"},
-    "output_files": {"out_1": "output.mp4"},
-    "ffmpeg_command": "-i {{in_1}} -ss 00:00 -to 00:10 {{out_1}}"}'
+--data '{
+    "input_files": {
+        "in_1": "https://storage.rendi.dev/sample/sample.avi"
+    },
+    "output_files": {
+        "out_1": "output1.gif"
+    },
+    "ffmpeg_command": "-i {{in_1}} -ss 00:00 -to 01:00 -vf select='\''lte(n\\,1)+gt(trunc(t/10),trunc(prev_t/10))'\'',setpts='\''PTS*0.025'\'',scale=trunc(oh*a/2)*2:160:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:160:-1:-1 -an -vsync vfr {{out_1}}"
+}'
 ```
 
-Running this command will return the command\_id:
+Running this command will return the command_id:
 
 ```json
 {
@@ -40,11 +44,11 @@ Running this command will return the command\_id:
 
 The command now runs in Rendi and you can check its' status:
 
-## Poll the command\_id until it reaches status SUCCESS
+## Poll the command_id until it reaches status SUCCESS
 
 ```bash
 curl --request GET \
-  --url https://api.rendi.dev/v1/poll-command/{command_id} \
+  --url https://api.rendi.dev/v1/commands/{command_id} \
   --header 'X-API-KEY: <api-key>'
 ```
 
