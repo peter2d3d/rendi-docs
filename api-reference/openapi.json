@@ -858,7 +858,7 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, keys must start with 'in_'",
+            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, file name should appear in the end of the url, keys must start with 'in_'",
             "example": {
               "in_1": "https://storage.rendi.dev/sample/first-video.avi",
               "in_2": "https://storage.rendi.dev/sample/second-video.avi"
@@ -937,7 +937,7 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, keys must start with 'in_'",
+            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, file name should appear in the end of the url, keys must start with 'in_'",
             "example": {
               "in_1": "https://storage.rendi.dev/sample/first-video.avi",
               "in_2": "https://storage.rendi.dev/sample/second-video.avi"
@@ -989,7 +989,7 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, keys must start with 'in_'",
+            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, file name should appear in the end of the url, keys must start with 'in_'",
             "example": {
               "in_1": "https://storage.rendi.dev/sample/first-video.avi",
               "in_2": "https://storage.rendi.dev/sample/second-video.avi"
