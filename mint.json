@@ -3,7 +3,8 @@
   "name": "Rendi",
   "logo": {
     "dark": "/logo/rendi_dark.svg",
-    "light": "/logo/rendi_light.svg"
+    "light": "/logo/rendi_light.svg",
+    "href": "https://app.rendi.dev/"
   },
   "favicon": "/favicon_rendi.svg",
   "colors": {
@@ -20,8 +21,12 @@
   },
   "topbarLinks": [
     {
-      "name": "Support",
+      "name": "support@rendi.dev",
       "url": "mailto:support@rendi.dev"
+    },
+    {
+      "name": "Sign In",
+      "url": "https://app.rendi.dev/sign-in"
     }
   ],
   "topbarCtaButton": {
