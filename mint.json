@@ -46,6 +46,7 @@
         "introduction",
         "quick-start",
         "examples",
+        "webhooks",
         "coming-soon"
       ]
     },
@@ -60,7 +61,11 @@
       "pages": [
         "api-reference/endpoint/run-ffmpeg-command",
         "api-reference/endpoint/poll-command",
+        "api-reference/endpoint/list-commands",
         "api-reference/endpoint/delete-command-files",
+        "api-reference/endpoint/upload-file",
+        "api-reference/endpoint/list-files",
+        "api-reference/endpoint/delete-file",
         "api-reference/endpoint/run-multiple-ffmpeg-commands",
         "api-reference/endpoint/run-chained-ffmpeg-commands"
       ]

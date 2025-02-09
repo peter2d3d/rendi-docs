@@ -90,7 +90,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CommandsListResponse"
+                  "items": {
+                    "$ref": "#/components/schemas/CommandsListItemResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Commands V1 Commands Get"
                 }
               }
             }
@@ -107,6 +111,9 @@
           },
           "429": {
             "description": "Rate limit exceeded"
+          },
+          "422": {
+            "description": "Invalid request"
           }
         },
         "security": [
@@ -122,7 +129,7 @@
           "API"
         ],
         "summary": "Delete Command Files",
-        "description": "Delete all output files associated with a command, this is mainly used for accounts that utilize permamnent storage",
+        "description": "Delete all stored output files associated with a command",
         "operationId": "delete_command_files_v1_commands__command_id__files_delete",
         "security": [
           {
@@ -155,7 +162,63 @@
             }
           },
           "404": {
-            "description": "Command not found"
+            "description": "Command files not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/files/{file_id}": {
+      "delete": {
+        "tags": [
+          "API"
+        ],
+        "summary": "Delete Stored File in Rendi",
+        "description": "Delete a stored file in Rendi",
+        "operationId": "delete_stored_file_v1_files__file_id__delete",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The UUID of the file to delete",
+              "title": "File Id"
+            },
+            "description": "The UUID of the file to delete"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
           },
           "422": {
             "description": "Validation Error",
@@ -228,6 +291,118 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/v1/files/upload": {
+      "post": {
+        "tags": [
+          "API",
+          "File Management"
+        ],
+        "summary": "Upload File",
+        "description": "Upload a file to Rendi storage for later use in commands. Make sure to use multipart/form-data when uploading the file. You can use these files as input files for commands.",
+        "operationId": "upload_file_v1_files_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_file_v1_files_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RendiStoredFile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "413": {
+            "description": "File too large"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/v1/files": {
+      "get": {
+        "tags": [
+          "API",
+          "FFmpeg Commands"
+        ],
+        "summary": "Get list of all stored files",
+        "description": "Get the list of all stored files for an account.",
+        "operationId": "get_files_v1_files_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RendiStoredFile"
+                  },
+                  "type": "array",
+                  "title": "Response Get Files V1 Files Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Invalid authorization key"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "422": {
+            "description": "Invalid request"
           }
         },
         "security": [
@@ -356,184 +531,20 @@
   },
   "components": {
     "schemas": {
-      "CommandOutputFile": {
+      "Body_upload_file_v1_files_upload_post": {
         "properties": {
-          "file_id": {
+          "upload_file": {
             "type": "string",
-            "title": "File Id",
-            "description": "Unique identifier for the output file",
-            "example": "987fcdeb-a89b-43d3-b456-789012345678"
-          },
-          "size_mbytes": {
-            "type": "number",
-            "title": "Size Mbytes",
-            "description": "Size of the output file in megabytes",
-            "example": 15.2
-          },
-          "is_deleted": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Is Deleted",
-            "description": "Whether the file has been deleted",
-            "example": false
-          },
-          "duration": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Duration",
-            "description": "Duration of the media file in seconds",
-            "example": 30.5
-          },
-          "file_type": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "File Type",
-            "description": "Type of the media file (video, audio, image, subtitles, etc.)",
-            "example": "video"
-          },
-          "file_format": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "File Format",
-            "description": "Format/container of the media file",
-            "example": "avi"
-          },
-          "storage_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Storage Url",
-            "description": "URL where the output file is stored",
-            "example": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.avi"
-          },
-          "width": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Width",
-            "description": "Width of the video in pixels",
-            "example": 1920
-          },
-          "height": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Height",
-            "description": "Height of the video in pixels",
-            "example": 1080
-          },
-          "codec": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Codec",
-            "description": "Codec used for the media file",
-            "example": "msmpeg4v2"
-          },
-          "frame_rate": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Frame Rate",
-            "description": "Frame rate of the video in frames per second",
-            "example": 30.0
-          },
-          "bitrate_video_kb": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Bitrate Video Kb",
-            "description": "Video bitrate in kilobits per second",
-            "example": 4000.0
-          },
-          "bitrate_audio_kb": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Bitrate Audio Kb",
-            "description": "Audio bitrate in kilobits per second",
-            "example": 128.0
-          },
-          "is_varying_frame_rate": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Is Varying Frame Rate",
-            "description": "Whether the video has a variable frame rate",
-            "example": false
+            "format": "binary",
+            "title": "Upload File",
+            "description": "The file to upload"
           }
         },
         "type": "object",
         "required": [
-          "file_id",
-          "size_mbytes"
+          "upload_file"
         ],
-        "title": "CommandOutputFile",
-        "description": "Represents an output file generated by running a command.\n\nThis model contains metadata about files produced by the command, including file details,\nmedia information, and storage location."
+        "title": "Body_upload_file_v1_files_upload_post"
       },
       "CommandResponse": {
         "properties": {
@@ -594,7 +605,7 @@
             "anyOf": [
               {
                 "additionalProperties": {
-                  "$ref": "#/components/schemas/CommandOutputFile"
+                  "$ref": "#/components/schemas/RendiStoredFileMetadata"
                 },
                 "type": "object"
               },
@@ -796,37 +807,6 @@
           "status": "SUCCESS"
         }
       },
-      "CommandsListResponse": {
-        "properties": {
-          "commands": {
-            "items": {
-              "$ref": "#/components/schemas/CommandsListItemResponse"
-            },
-            "type": "array",
-            "title": "Commands",
-            "description": "List of commands and their details",
-            "example": [
-              {
-                "command_id": "123e4567-e89b-12d3-a456-426614174000",
-                "created_at": "2024-01-01T00:00:00Z",
-                "status": "SUCCESS"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "title": "CommandsListResponse",
-        "description": "Response model for FFmpeg command status.\n\nContains information about the command execution status, any errors that occurred,\noutput files generated, and the original request details.",
-        "example": {
-          "commands": [
-            {
-              "command_id": "123e4567-e89b-12d3-a456-426614174000",
-              "created_at": "2024-01-01T00:00:00Z",
-              "status": "SUCCESS"
-            }
-          ]
-        }
-      },
       "CommandsResponse": {
         "properties": {
           "command_ids": {
@@ -858,7 +838,7 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, file name should appear in the end of the url, keys must start with 'in_'",
+            "description": "Dictionary mapping file aliases to their publicly accessible paths, \n        file name should appear in the end of the url, keys must start with 'in_'. \n        You can use public file urls, google drive, dropbox, rendi stored files, s3 stored files, etc. as long as they are publicly accessible.",
             "example": {
               "in_1": "https://storage.rendi.dev/sample/first-video.avi",
               "in_2": "https://storage.rendi.dev/sample/second-video.avi"
@@ -937,7 +917,7 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, file name should appear in the end of the url, keys must start with 'in_'",
+            "description": "Dictionary mapping file aliases to their publicly accessible paths, \n        file name should appear in the end of the url, keys must start with 'in_'. \n        You can use public file urls, google drive, dropbox, rendi stored files, s3 stored files, etc. as long as they are publicly accessible.",
             "example": {
               "in_1": "https://storage.rendi.dev/sample/first-video.avi",
               "in_2": "https://storage.rendi.dev/sample/second-video.avi"
@@ -989,7 +969,7 @@
             },
             "type": "object",
             "title": "Input Files",
-            "description": "Dictionary mapping file aliases to their publicly accessible storage paths, file name should appear in the end of the url, keys must start with 'in_'",
+            "description": "Dictionary mapping file aliases to their publicly accessible paths, \n        file name should appear in the end of the url, keys must start with 'in_'. \n        You can use public file urls, google drive, dropbox, rendi stored files, s3 stored files, etc. as long as they are publicly accessible.",
             "example": {
               "in_1": "https://storage.rendi.dev/sample/first-video.avi",
               "in_2": "https://storage.rendi.dev/sample/second-video.avi"
@@ -1054,6 +1034,221 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "RendiStoredFile": {
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "title": "File Id",
+            "description": "Unique identifier for the output file",
+            "example": "987fcdeb-a89b-43d3-b456-789012345678"
+          },
+          "size_mbytes": {
+            "type": "number",
+            "title": "Size Mbytes",
+            "description": "Size of the output file in megabytes",
+            "example": 15.2
+          },
+          "storage_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storage Url",
+            "description": "URL where the file is stored",
+            "example": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.avi"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file_id",
+          "size_mbytes"
+        ],
+        "title": "RendiStoredFile",
+        "description": "Represents a file stored by rendi. Could either be an uploaded file or a file generated by running a command.\n\nBasic model containing file location size and id."
+      },
+      "RendiStoredFileMetadata": {
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "title": "File Id",
+            "description": "Unique identifier for the output file",
+            "example": "987fcdeb-a89b-43d3-b456-789012345678"
+          },
+          "size_mbytes": {
+            "type": "number",
+            "title": "Size Mbytes",
+            "description": "Size of the output file in megabytes",
+            "example": 15.2
+          },
+          "storage_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storage Url",
+            "description": "URL where the file is stored",
+            "example": "https://storage.rendi.dev/123e4567-e89b-12d3-a456-426614174000/output.avi"
+          },
+          "is_deleted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Deleted",
+            "description": "Whether the file has been deleted",
+            "example": false
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration",
+            "description": "Duration of the media file in seconds",
+            "example": 30.5
+          },
+          "file_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Type",
+            "description": "Type of the media file (video, audio, image, subtitles, etc.)",
+            "example": "video"
+          },
+          "file_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Format",
+            "description": "Format/container of the media file",
+            "example": "avi"
+          },
+          "width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Width",
+            "description": "Width of the video in pixels",
+            "example": 1920
+          },
+          "height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height",
+            "description": "Height of the video in pixels",
+            "example": 1080
+          },
+          "codec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codec",
+            "description": "Codec used for the media file",
+            "example": "msmpeg4v2"
+          },
+          "frame_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frame Rate",
+            "description": "Frame rate of the video in frames per second",
+            "example": 30.0
+          },
+          "bitrate_video_kb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate Video Kb",
+            "description": "Video bitrate in kilobits per second",
+            "example": 4000.0
+          },
+          "bitrate_audio_kb": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bitrate Audio Kb",
+            "description": "Audio bitrate in kilobits per second",
+            "example": 128.0
+          },
+          "is_varying_frame_rate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Varying Frame Rate",
+            "description": "Whether the video has a variable frame rate",
+            "example": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "file_id",
+          "size_mbytes"
+        ],
+        "title": "RendiStoredFileMetadata",
+        "description": "Represents a file stored by rendi. Could either be an uploaded file or a file generated by running a command.\n\nThis model contains metadata about files stored in rendi storage, including file details,\nmedia information, and storage location."
       },
       "ValidationError": {
         "properties": {

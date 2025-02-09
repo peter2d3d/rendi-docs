@@ -1,0 +1,85 @@
+---
+title: 'Webhooks'
+description: 'Learn how to use Rendi webhooks to get notified about command processing status'
+---
+
+# Webhooks
+
+Rendi provides webhooks to notify you when FFmpeg command processing is completed, whether successful or failed. This eliminates the need for continuous polling and allows your application to react to processing events asynchronously.
+
+## Setting Up Webhooks
+
+When submitting a command to any of Rendi's command endpoints (run-ffmpeg-command, run-multiple-ffmpeg-commands, or run-chained-ffmpeg-commands), you can include a `webhook_url` parameter in your request. This URL will receive a POST request when the processing is complete.
+
+```json
+{
+  "command": "ffmpeg -i input.mp4 output.mp4",
+  "webhook_url": "https://your-domain.com/webhook-endpoint"
+}
+```
+
+## Webhook Payload
+
+When the command processing is complete, Rendi will send a POST request to your webhook URL. The payload will be identical to what you would receive from the polling endpoint, containing the complete status of the command execution.
+
+### Example Webhook Payload
+
+```json
+{
+  "command_id": "cmd_123abc456def",
+  "status": "completed",
+  "created_at": "2024-03-20T10:30:00Z",
+  "started_at": "2024-03-20T10:30:01Z",
+  "completed_at": "2024-03-20T10:30:15Z",
+  "output_files": [
+    {
+      "filename": "output.mp4",
+      "size_bytes": 1048576,
+      "download_url": "https://storage.rendi.com/files/output.mp4?token=xyz"
+    }
+  ],
+  "ffmpeg_output": "ffmpeg version n4.4 Copyright (c) 2000-2021...",
+  "error": null
+}
+```
+
+For failed commands, the payload will include error details:
+
+```json
+{
+  "command_id": "cmd_789xyz",
+  "status": "failed",
+  "created_at": "2024-03-20T11:00:00Z",
+  "started_at": "2024-03-20T11:00:01Z",
+  "completed_at": "2024-03-20T11:00:05Z",
+  "output_files": [],
+  "ffmpeg_output": "ffmpeg version n4.4 Copyright (c) 2000-2021...",
+  "error": {
+    "message": "Input file not found",
+    "code": "INPUT_FILE_NOT_FOUND"
+  }
+}
+```
+
+## Webhook Retry Policy
+
+If your webhook endpoint is unavailable or returns a non-2XX response code, Rendi will retry the webhook delivery with the following retry schedule:
+- 1st retry: 30 seconds after initial failure
+- 2nd retry: 5 minutes after first retry
+- 3rd retry: 1 hour after second retry
+- 4th retry: 24 hours after third retry
+
+After all retry attempts are exhausted, the webhook delivery will be marked as failed, and you will need to use the polling endpoint to retrieve the command status.
+
+## Security Best Practices
+
+To ensure the security of your webhook endpoint:
+
+1. Use HTTPS for your webhook URL
+2. Validate the webhook signature (coming soon)
+3. Implement proper authentication for your webhook endpoint
+4. Process webhooks asynchronously to prevent timeout issues
+
+## Webhook Timeout
+
+Your webhook endpoint should respond within 10 seconds. If it takes longer, Rendi will consider the delivery attempt failed and will retry according to the retry policy.
