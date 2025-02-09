@@ -63,7 +63,6 @@
         "api-reference/endpoint/poll-command",
         "api-reference/endpoint/list-commands",
         "api-reference/endpoint/delete-command-files",
-        "api-reference/endpoint/upload-file",
         "api-reference/endpoint/list-files",
         "api-reference/endpoint/delete-file",
         "api-reference/endpoint/run-multiple-ffmpeg-commands",
