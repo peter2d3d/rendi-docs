@@ -13,8 +13,8 @@ In rendi's dashboard, under the "Configuration" tab, you can set your webhook UR
 
 ## Webhook Payload
 
-When the command processing is complete, Rendi will send a POST request to your webhook URL. 
-The payload will have a data field which will be identical to what you would receive from the polling endpoint - containing the complete status of the command execution, 
+When the command processing is complete, Rendi will send a POST request to your webhook URL.
+The payload will have a data field which will be identical to what you would receive from the polling endpoint - containing the complete status of the command execution,
 and a timestamp of when the webhook was sent - unix epoch time in milliseconds.
 
 ### Example Webhook Payload
@@ -22,6 +22,7 @@ and a timestamp of when the webhook was sent - unix epoch time in milliseconds.
 ```json
 {
   "data": {
+    "command_id": "123e4567-e89b-12d3-a456-426614174000",
     "status": "SUCCESS",
     "output_files": {
       "out_1": {
@@ -75,15 +76,27 @@ For failed commands, the payload will include error details:
 
 ## Webhook Retry Policy
 
-If your webhook endpoint is unavailable or returns a non-2XX response code, Rendi will retry the webhook delivery with the following retry schedule:
+Each message is attempted based on the following schedule, where each period is started following the failure of the preceding attempt:
 
-- 1st retry: 30 seconds after initial failure
-- 2nd retry: 5 minutes after first retry
-- 3rd retry: 1 hour after second retry
-- 4th retry: 24 hours after third retry
+* Immediately
+* 5 seconds
+* 5 minutes
+* 30 minutes
+* 2 hours
+* 5 hours
+* 10 hours
+* 10 hours (in addition to the previous)
+
+If an endpoint is removed or disabled delivery attempts to the endpoint will be disabled as well.
+
+For example, an attempt that fails three times before eventually succeeding will be delivered roughly 35 minutes and 5 seconds following the first attempt.
 
 After all retry attempts are exhausted, the webhook delivery will be marked as failed, and you will need to use the polling endpoint to retrieve the command status.
 
 ## Webhook Timeout
 
-Your webhook endpoint should respond within 10 seconds. If it takes longer, Rendi will consider the delivery attempt failed and will retry according to the retry policy.
+Your webhook endpoint should respond within 15 seconds. If it takes longer, Rendi will consider the delivery attempt failed and will retry according to the retry policy.
+
+## Disabling failing endpoints
+
+If all attempts to a specific endpoint fail for a period of 5 days, the endpoint will be disabled.

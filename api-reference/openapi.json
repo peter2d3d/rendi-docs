@@ -575,6 +575,17 @@
       },
       "CommandStatusResponse": {
         "properties": {
+          "command_id": {
+            "type": "string",
+            "title": "Command Id",
+            "description": "Unique identifier for the submitted command",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CommandStatus",
+            "description": "Current status of the FFmpeg command",
+            "example": "SUCCESS"
+          },
           "error_status": {
             "anyOf": [
               {
@@ -648,11 +659,6 @@
               }
             }
           },
-          "status": {
-            "$ref": "#/components/schemas/CommandStatus",
-            "description": "Current status of the FFmpeg command",
-            "example": "SUCCESS"
-          },
           "original_request": {
             "type": "object",
             "title": "Original Request",
@@ -695,12 +701,14 @@
         },
         "type": "object",
         "required": [
+          "command_id",
           "status",
           "original_request"
         ],
         "title": "CommandStatusResponse",
         "description": "Response model for FFmpeg command status.\n\nContains information about the command execution status, any errors that occurred,\noutput files generated, and the original request details.",
         "example": {
+          "command_id": "123e4567-e89b-12d3-a456-426614174000",
           "ffmpeg_command_run_seconds": 19.58051347732544,
           "original_request": {
             "ffmpeg_command": "-i {{in_1}} -ss 00:00 -to 00:30 -filter_complex [0:v]split=2[vid1][vid2];[vid1]scale=trunc(oh*a/2)*2:320:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:320:-1:-1[320p];[vid2]scale=trunc(oh*a/2)*2:180:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:180:-1:-1[180p] -map [320p] -map 0:a -c:a copy -c:v libx264 -preset medium {{out_1}}  -map [180p] -map 0:a -c:a copy -c:v libx264 -preset medium {{out_2}}",
