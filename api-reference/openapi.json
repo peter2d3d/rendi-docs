@@ -959,13 +959,12 @@
         "title": "FFmpegCommandRequest",
         "description": "Request model for submitting a single FFmpeg command.\n\nThis model allows submitting an FFmpeg command with input and output file specifications.\nInput file aliases must start with 'in_' and direct to a publicly accessible file, and\noutput file aliases must start with 'out_' and only name a file name to be created.",
         "example": {
-          "ffmpeg_command": "-i {{in_1}} -i {{in_2}} -filter_complex [0:v][1:v]hstack=inputs=2[v] -map [v] {{out_1}}",
+          "ffmpeg_command": "-i {{in_1}} -ss 00:00 -to 01:00 -vf select='''lte(n\\,1)+gt(trunc(t/10),trunc(prev_t/10))''',setpts='''PTS*0.025''',scale=trunc(oh*a/2)*2:160:force_original_aspect_ratio=decrease,pad=trunc(oh*a/2)*2:160:-1:-1 -an -vsync vfr {{out_1}}",
           "input_files": {
-            "in_1": "https://storage.rendi.dev/sample/first-video.avi",
-            "in_2": "https://storage.rendi.dev/sample/second-video.avi"
+            "in_1": "https://storage.rendi.dev/sample/sample.avi"
           },
           "output_files": {
-            "out_1": "output.avi"
+            "out_1": "output1.gif"
           }
         }
       },
